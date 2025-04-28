@@ -87,7 +87,7 @@ from LightCurve import (
     MakeLightCurve,
     PlotLightCurve,
 )
-
+from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
 # Warnings
 warnings.filterwarnings("ignore")
 

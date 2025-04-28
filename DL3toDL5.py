@@ -3,7 +3,7 @@
 Author: Nicki Bond
 Date: 2025-Jan
 Purpose:
-- This script will take the VEGAS DL3 data and convert it to DL5 data.
+- This script will take the VEGAS DL3 data files and convert them to DL5 data products.
 - It takes a set of DL3 files and makes an energy spectrum using Gammapy.
 - It also can plot the VEGAS spectrum on the same plot if a VEGAS Stage 6 log file is provided.
 - It can also make a light curve. There are options for the user to change the parameters of gammapy's LightCurveEstimator.
@@ -18,7 +18,6 @@ TODO:
 - Add different spectral models (currently just Power Law)
 - Add different background models
 - Add ability to load and compare to ED
-- Add ability to do SED per period
 - Clean up importer to avoid circular imports
 - Currently if using SEDTimeBinFile, the VEGAS spectrum is printed n times in log file and on the plots which is incorrect. 
 
@@ -138,6 +137,11 @@ else:
     flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
     PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
 ##########################################
+
+######### Look for Spectral Variability ##########
+if 'time_bins' in locals() and time_bins:
+    MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
+###########################################
 
 
 ######### Integral Flux ############

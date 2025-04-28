@@ -195,4 +195,5 @@ def PlotSpectrum(flux_points_dataset, args, path_to_log, tmin = None, tmax = Non
         fig.savefig(args.ADir + f"/SpectrumFrom{tmin}To{tmax}.pdf")
     else:
         fig.savefig(args.ADir + "/Spectrum.pdf")
+    plt.close()
     return 
