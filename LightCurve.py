@@ -43,6 +43,13 @@ def MakeLightCurve(path_to_log, datasets, args):
         selection_optional=args.LightCurveSelectionOptional,
     )
     lc = lc_maker.run(datasets)
+    print("LightCurve object info:")
+    print(lc)
+    print("Axes:", lc.axes)
+    print("Available columns:", lc.table.colnames)
+    print("Units of time_min:", lc.table['time_min'].unit)
+    print("Units of time_max:", lc.table['time_max'].unit)
+    print("Units of flux:", lc.table['flux'].unit)
     average_flux = np.nanmean(lc.flux.data)
 
     f.write("Light CurveFlux Points: \n")

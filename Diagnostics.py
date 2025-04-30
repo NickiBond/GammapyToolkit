@@ -84,3 +84,28 @@ def DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args):
         )
         f.write("--------------------------------------------------\n")
     return
+
+def DiagnosticsOnOffCounts(path_to_log, datasets, args):
+    with open(path_to_log, "a") as f:
+        f.write('Finding on and off counts per run')
+        f.write('Saving on and off counts to'+ args.ADir+'/OnOffCounts')
+        f.write("--------------------------------------------------\n")
+    with open(args.ADir+'/OnOffCounts.csv', 'w') as f:
+        for dataset in datasets:
+            f.write(str(dataset.name) + ", " + str(dataset.counts.data.sum()) + ", " +  str(dataset.counts_off.data.sum())+','+ str(dataset.alpha.data[0,0,:][0])+'\n')   
+    return 1
+
+
+def DiagnosticsPlotOnOffCounts(path_to_on_off_counts, args):
+    df = pd.read_csv(path_to_on_off_counts, header=None)
+    file = df[0]
+    on = df[1]
+    off = df[2]
+    plt.figure()
+    plt.hist(on)    
+    plt.xlabel("On counts per run")
+    plt.savefig(args.ADir + '/OnCountsPerRunHistogram')
+    plt.figure()
+    plt.hist(off)    
+    plt.xlabel("Off counts per run")
+    plt.savefig(args.ADir + '/OffCountsPerRunHistogram')

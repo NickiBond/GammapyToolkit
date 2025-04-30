@@ -70,6 +70,8 @@ from Diagnostics import (
     DiagnosticsTotalTimeStats,
     DiagnosticsDeadtimeDistribution,
     DiagnosticsPointingOffsetDistribution,
+    DiagnosticsOnOffCounts,
+    DiagnosticsPlotOnOffCounts
 )
 from EnergyAxes import EnergyAxes
 from GetGeometry import (

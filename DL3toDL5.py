@@ -54,7 +54,7 @@ cmd_line_args = ' '.join(sys.argv)
 os.makedirs(args.ADir, exist_ok=True)
 path_to_log = args.ADir + "/log.txt"
 with open(path_to_log, "w") as f:
-    f.write(f"Command line arguments: {cmd_line_args}\n")
+    f.write(f"Command line arguments: \n{cmd_line_args}\n")
     f.write("Log file for DL3toDL5.py\n")
     f.write("Author: Nicki Bond\n")
     f.write("Date Run: " + str(datetime.now()) + "\n")
@@ -79,6 +79,7 @@ with open(path_to_log, "a") as f:
 DiagnosticsTotalTimeStats(path_to_log, obs_table, args)
 DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args)
 DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args)
+ 
 ########################################
 
 
@@ -114,8 +115,6 @@ fit_results = []
 stackeds = []
 if args.SEDTimeBinFile is not None:   
     time_bins = SpectrumTimeBins(args)
-if 'time_bins' in locals() and time_bins:
-
     for i, (tmin, tmax) in enumerate(time_bins):
         with open(path_to_log, "a") as f:
             f.write(f"Making SED for observations from {tmin} to {tmax}\n")
@@ -136,6 +135,8 @@ if 'time_bins' in locals() and time_bins:
 else:
     flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
     PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
+    DiagnosticsOnOffCounts(path_to_log, datasets, args)
+    DiagnosticsPlotOnOffCounts(path_to_on_off_counts = args.ADir+'/OnOffCounts.csv', args=args)
 ##########################################
 
 ######### Look for Spectral Variability ##########
@@ -184,6 +185,6 @@ if args.LightCurve == True:
 ######### Write End of Log File ##########
 with open(path_to_log, "a") as f:
     f.write("--------------------------------------------------\n")
-    f.write("Script Runtime: %s minutes" % ((time.time() - script_start_time) / 60))
+    f.write("Script Runtime: %s minutes \n" % ((time.time() - script_start_time) / 60))
     f.write("--------------------------------------------------\n")
 #################################################
