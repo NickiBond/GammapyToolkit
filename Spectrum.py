@@ -28,7 +28,7 @@ def MakeSpectrumFluxPoints(observations, geom, energy_axis, energy_axis_true, on
     )
     # Containment correction False because otherwise get: ValueError: Cannot apply containment correction for point-like IRF.
     bkg_maker = ReflectedRegionsBackgroundMaker(exclusion_mask=exclusion_mask)
-    safe_mask_maker = SafeMaskMaker(methods=["aeff-max"], aeff_percent=10)
+    safe_mask_maker = SafeMaskMaker(methods=["aeff-default"], aeff_percent=5, bias_percent = 5, offset_max = 1.7*u.deg)
     # Create the datasets
     datasets = Datasets()
     for obs in observations:
