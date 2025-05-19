@@ -11,16 +11,6 @@ Purpose:
 Scope:
 - This script only works on point sources.
 
-TODO:
-- Currently uses object name parameter for both determining the source coordinates and which runs to use. Still to add a way to use sources in the background region of other sources.
-- - This would involve separate parameter for specifying source position
-- Add user defined exclusion regions
-- Add different spectral models (currently just Power Law)
-- Add different background models
-- Add ability to load and compare to ED
-- Clean up importer to avoid circular imports
-- Currently if using SEDTimeBinFile, the VEGAS spectrum is printed n times in log file and on the plots which is incorrect. 
-
 To Run:
 - Activate the environment:
 - - source ~/NBvenv/bin/activate
