@@ -6,6 +6,7 @@ def SelectRuns(path_to_log, args):
     f.write("Data Selection:\n")
     data_store = DataStore.from_dir(f"{args.DL3Path}")
     obs_table = data_store.obs_table
+    obs_table.sort('OBS_ID')
     f.write(f"Initial length of obs table: {len(obs_table)} \n")
     # Exclude runs that are not in the run list if run list is provided
     if args.RunList == None:
