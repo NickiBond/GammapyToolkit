@@ -29,7 +29,7 @@ def GetExclusionRegions(target_position, args, path_to_log):
     exclusion_regions = []
     exclusion_regions.append(
         CircleSkyRegion(
-            center=SkyCoord(target_position.ra, target_position.dec, unit="deg"),
+            center=SkyCoord(target_position.ra, target_position.dec, unit="deg", frame ='icrs'),
             radius=0.3 * u.deg,
         )
     )
@@ -38,7 +38,7 @@ def GetExclusionRegions(target_position, args, path_to_log):
         exclusion_regions.append(
             CircleSkyRegion(
                 center=SkyCoord(
-                    target_position_star.ra, target_position_star.dec, unit="deg"
+                    target_position_star.ra, target_position_star.dec, unit="deg", frame='icrs'
                 ),
                 radius=0.1 * u.deg,
             )
