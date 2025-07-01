@@ -58,7 +58,7 @@ WriteInputParametersToLog(path_to_log)
 # Select data from the DL3Path directory
 # Select data based on the run list, run exclude list, object name, and date range
 # Select target position
-obs_table, observations, target_position = SelectRuns(path_to_log, args)
+obs_table, observations, target_position, obs_ids = SelectRuns(path_to_log, args)
 with open(path_to_log, "a") as f:
     f.write("Target Position: " + str(target_position) + "\n")
 ########################################
@@ -68,7 +68,8 @@ with open(path_to_log, "a") as f:
 DiagnosticsTotalTimeStats(path_to_log, obs_table, args)
 DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args)
 DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args)
- 
+DiagnosticsPeekAtIRFs(path_to_log, observations, args)
+DiagnosticsPeekAtEvents(path_to_log, observations, args)
 ########################################
 
 

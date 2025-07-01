@@ -85,6 +85,42 @@ def DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args):
         f.write("--------------------------------------------------\n")
     return
 
+
+def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
+    irf_dir = os.path.join(args.ADir, "IRF_Plots")
+    os.makedirs(irf_dir, exist_ok=True)
+    # Generate and save IRF plots
+    with open(path_to_log, "a") as f:
+        f.write("Peek at IRFs for first 10 observations:\n")
+        for obs in observations[:10]:
+            obs.peek(figsize=(25, 5))
+            fig = plt.gcf()  # Get the current figure
+            obs_id = obs.obs_id
+            filename = f"irf_obs_{obs_id}.png"
+            filepath = os.path.join(irf_dir, filename)
+            fig.savefig(filepath, bbox_inches="tight")
+            f.write(f"Saved IRF figure for Obs ID {obs_id} to {filepath}\n")
+            plt.close(fig)
+    return
+
+
+def DiagnosticsPeekAtEvents(path_to_log, observations, args):
+    event_dir = os.path.join(args.ADir, "Event_Plots")
+    os.makedirs(event_dir, exist_ok=True)
+    # Generate and save event plots
+    with open(path_to_log, "a") as f:
+        f.write("Peek at Events for first 10 observations:\n")
+        for obs in observations[:10]:
+            obs.events.peek()
+            fig = plt.gcf()  # Get the current figure
+            obs_id = obs.obs_id
+            filename = f"event_obs_{obs_id}.png"
+            filepath = os.path.join(event_dir, filename)
+            fig.savefig(filepath, bbox_inches="tight")
+            f.write(f"Saved Event figure for Obs ID {obs_id} to {filepath}\n")
+            plt.close(fig)
+    return
+
 def DiagnosticsOnOffCounts(path_to_log, datasets, args):
     with open(path_to_log, "a") as f:
         f.write('Finding on and off counts per run')

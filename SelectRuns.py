@@ -96,8 +96,9 @@ def SelectRuns(path_to_log, args):
     observations = data_store.get_observations(
         obs_table["OBS_ID"], required_irf="point-like"  #includes ["events", "gti", "aeff", "edisp"]
     )
+    obs_ids = observations.ids
     f.write("--------------------------------------------------\n")
     f.write("Observations kept: \n" + str(np.array(obs_table["OBS_ID"])) + "\n")
     f.write("--------------------------------------------------\n")
     f.close()
-    return obs_table, observations, target_position
+    return obs_table, observations, target_position, obs_ids

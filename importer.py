@@ -74,7 +74,9 @@ from Diagnostics import (
     DiagnosticsDeadtimeDistribution,
     DiagnosticsPointingOffsetDistribution,
     DiagnosticsOnOffCounts,
-    DiagnosticsPlotOnOffCounts
+    DiagnosticsPlotOnOffCounts,
+    DiagnosticsPeekAtIRFs,
+    DiagnosticsPeekAtEvents
 )
 from EnergyAxes import EnergyAxes
 from GetGeometry import (
