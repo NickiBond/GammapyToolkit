@@ -3,8 +3,15 @@ from importer import *
 
 def SelectRuns(path_to_log, args):
     f = open(path_to_log, "a")
-    f.write("Data Selection:\n")
     data_store = DataStore.from_dir(f"{args.DL3Path}")
+    # Write the data store info to the log file
+    # Capture stdout into a string buffer
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        data_store.info()   
+    # Write the captured output to the log file
+    f.write(buf.getvalue() + "\n")
+    f.write("Data Selection:\n")
     obs_table = data_store.obs_table
     obs_table.sort('OBS_ID')
     f.write(f"Initial length of obs table: {len(obs_table)} \n")

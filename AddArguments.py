@@ -19,7 +19,7 @@ def get_parser():
         help="Path to the DL3 data folder. default= './DL3'",
         type=str,
         required=False,
-        default="./DL3,
+        default="./DL3",
     )
     parser.add_argument(
         "-ADir",
