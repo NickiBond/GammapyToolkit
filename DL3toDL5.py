@@ -58,8 +58,7 @@ WriteInputParametersToLog(path_to_log)
 # Select data from the DL3Path directory
 # Select data based on the run list, run exclude list, object name, and date range
 # Select target position
-obs_table, observations = SelectRuns(path_to_log, args)
-target_position = SkyCoord.from_name(args.ObjectName).icrs
+obs_table, observations, target_position = SelectRuns(path_to_log, args)
 with open(path_to_log, "a") as f:
     f.write("Target Position: " + str(target_position) + "\n")
 ########################################

@@ -14,6 +14,8 @@ def SelectRuns(path_to_log, args):
     f.write("Data Selection:\n")
     obs_table = data_store.obs_table
     obs_table.sort('OBS_ID')
+    target_position = SkyCoord.from_name(args.ObjectName).icrs
+    f.write(f"Target Position: {target_position.to_string('hmsdms')} \n")
     f.write(f"Initial length of obs table: {len(obs_table)} \n")
     # Exclude runs that are not in the run list if run list is provided
     if args.RunList == None:
@@ -39,13 +41,28 @@ def SelectRuns(path_to_log, args):
             + "\n"
         )
     #  Only accept runs with a certain object name
-    if args.ObjectName != None:
+    if args.ObjectName != None and args.IncludeNearby == False:
         mask = obs_table["OBJECT"] == args.ObjectName
         obs_table = obs_table[mask]
         f.write(
             "Only observations with OBJECT name "
             + args.ObjectName
             + " kept. Length of obs table after selection: "
+            + str(len(obs_table))
+            + "\n"
+        )
+    
+    if args.IncludeNearby:
+        selection = dict(
+            type="sky_circle",
+            frame="icrs",
+            lon=f"{target_position.ra.value} deg",
+            lat=f"{target_position.dec.value} deg",
+            radius="5 deg",
+        )
+        obs_table = data_store.obs_table.select_observations(selection)
+        f.write(
+            "Only observations within 5 degrees of the target position kept. Length of obs table after selection: "
             + str(len(obs_table))
             + "\n"
         )
@@ -83,4 +100,4 @@ def SelectRuns(path_to_log, args):
     f.write("Observations kept: \n" + str(np.array(obs_table["OBS_ID"])) + "\n")
     f.write("--------------------------------------------------\n")
     f.close()
-    return obs_table, observations
+    return obs_table, observations, target_position

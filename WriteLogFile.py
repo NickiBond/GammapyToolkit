@@ -26,6 +26,7 @@ def WriteInputParametersToLog(path_to_log):
     with open(path_to_log, "a") as f:
         f.write("Input Parameters:\n")
         f.write("ObjectName: " + args.ObjectName + "\n")
+        f.write("IncludeNearby: " + str(args.IncludeNearby) + "\n")
         f.write("DL3Path: " + args.DL3Path + "\n")
         f.write("ADir: " + args.ADir + "\n")
         f.write("RunList: " + str(args.RunList) + "\n")

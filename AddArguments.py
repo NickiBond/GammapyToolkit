@@ -15,6 +15,13 @@ def get_parser():
         required=True,
     )
     parser.add_argument(
+        "-IncludeNearby",
+        help="Include observations of sources within 5 deg of <ObjectName> in the analysis. default= False",
+        type=bool,
+        required=False,
+        default=False,
+    )
+    parser.add_argument(
         "-DL3Path",
         help="Path to the DL3 data folder. default= './DL3'",
         type=str,
