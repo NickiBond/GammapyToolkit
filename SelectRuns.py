@@ -16,6 +16,7 @@ def SelectRuns(path_to_log, args):
     obs_table.sort('OBS_ID')
     target_position = SkyCoord.from_name(args.ObjectName).icrs
     f.write(f"Target Position: {target_position.to_string('hmsdms')} \n")
+    f.write(f"Target Position: {target_position} \n")
     f.write(f"Initial length of obs table: {len(obs_table)} \n")
     # Exclude runs that are not in the run list if run list is provided
     if args.RunList == None:
