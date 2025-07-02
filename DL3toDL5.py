@@ -87,10 +87,9 @@ with open(path_to_log, "a") as f:
 ########## Define Geometry #############
 # Define the on region
 # Define exclusion regions
-on_region = GetOnRegion(target_position, args, path_to_log)
+on_region, geom = GetOnRegion(target_position, args, energy_axis, path_to_log)
 exclusion_regions = GetExclusionRegions(target_position, args, path_to_log)
-exclusion_mask = GetExclusionMask(exclusion_regions, target_position)
-geom = RegionGeom.create(region=on_region, axes=[energy_axis], binsz_wcs=0.001)
+exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axis)
 ##############################################
 
 

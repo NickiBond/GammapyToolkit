@@ -1,10 +1,11 @@
 from importer import *
 
-def GetOnRegion(target_position, args, path_to_log):
+def GetOnRegion(target_position, args, energy_axis, path_to_log):
     on_region = CircleSkyRegion(center=target_position, radius=args.OnRegionRadius * u.deg)
     with open(path_to_log, "a") as f:
         f.write("On Region: " + str(on_region) + "\n")
-    return on_region
+    geom = RegionGeom.create(region=on_region, axes=[energy_axis])
+    return on_region, geom
 
 def GetExclusionRegions(target_position, args, path_to_log):
     vizier = Vizier(catalog="Tycho2")
@@ -45,12 +46,14 @@ def GetExclusionRegions(target_position, args, path_to_log):
         )
     return exclusion_regions
 
-def GetExclusionMask(exclusion_regions, target_position):
+def GetExclusionMask(exclusion_regions, target_position, energy_axis):
     exclusion_mask_geom = WcsGeom.create(
-        npix=(1000, 1000),  # width of the map in pixels
-        binsz=0.003,  # in degrees
+        binsz=0.01,  # in degrees
+        width = (4, 4),
         skydir=target_position,
-        proj="TAN", 
+        proj="CAR",
+        frame ="icrs",
+        axes = [energy_axis]
     )
-    exclusion_mask = ~exclusion_mask_geom.to_image().region_mask(exclusion_regions)
+    exclusion_mask = ~exclusion_mask_geom.to_image().to_cube([energy_axis.squash()]).region_mask(exclusion_regions)
     return exclusion_mask
