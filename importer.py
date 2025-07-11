@@ -84,7 +84,6 @@ from GetGeometry import (
     GetExclusionRegions,
     GetExclusionMask,
 )
-from LiMaSignificance import *
 from Spectrum import (
     SpectrumTimeBins,
     MakeSpectrumFluxPoints,
@@ -97,6 +96,8 @@ from LightCurve import (
 from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
 # Warnings
 warnings.filterwarnings("ignore")
+
+from DataReduction import *
 
 # Plot Style
 style.use("tableau-colorblind10")

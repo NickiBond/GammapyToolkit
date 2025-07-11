@@ -44,10 +44,10 @@ cmd_line_args = ' '.join(sys.argv)
 os.makedirs(args.ADir, exist_ok=True)
 path_to_log = args.ADir + "/log.txt"
 with open(path_to_log, "w") as f:
-    f.write(f"Command line arguments: \n{cmd_line_args}\n")
     f.write("Log file for DL3toDL5.py\n")
     f.write("Author: Nicki Bond\n")
     f.write("Date Run: " + str(datetime.now()) + "\n")
+    f.write(f"Command line arguments: \n{cmd_line_args}\n")
     f.write("--------------------------------------------------\n")
 WritePackageVersionsToLog(path_to_log)
 WriteInputParametersToLog(path_to_log)
@@ -76,6 +76,7 @@ DiagnosticsPeekAtEvents(path_to_log, observations, args)
 # Define true energy axis
 energy_axis, energy_axis_true = EnergyAxes(args)
 with open(path_to_log, "a") as f:
+    f.write("--------------------------------------------------\n")
     f.write("Energy Axis: " + str(energy_axis) + "\n")
     f.write("True Energy Axis: " + str(energy_axis_true) + "\n")
     f.write("Energy Axis Bin Edges: \n")
@@ -92,12 +93,38 @@ exclusion_regions = GetExclusionRegions(target_position, args, path_to_log)
 exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axis)
 ##############################################
 
+########### Data Reduction Chain: Significance and Spectrum ############
+# Note this is done with whole dataset (i.e. before we remove areas with higher systematics)
+fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args)
 
-
-########## Make Spectrum #############
-# Make SED for each time bin if provided
-# Make SED for all observations if no time bin file is provided
-# Plot spectrum or spectra
+# Run Data Reduction Chain for each time bin if specified
+fit_results = []
+if args.SEDTimeBinFile is not None:   
+    time_bins = SpectrumTimeBins(args)
+    for i, (tmin, tmax) in enumerate(time_bins):
+        with open(path_to_log, "a") as f:
+            f.write(f"Making SED for observations from {tmin} to {tmax}\n")
+        label = f"timebin_{i}"
+        selected_obs = [ 
+            obs
+            for obs in observations
+            if obs.tstart.mjd >= tmin and obs.tstart.mjd <= tmax
+            # if an observation crosses the time bin edge we include it in first time bin (i.e. we look at tstart not tstop)
+        ]
+        selected_obs_ids = [obs.obs_id for obs in selected_obs]
+        if len(selected_obs) == 0:
+            with open(path_to_log, "a") as f:
+                f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
+            continue
+        fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, tmin=tmin, tmax=tmax)
+        fit_results.append(fit_result)
+    ######### Look for Spectral Variability ##########
+    MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
+    # flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
+    # PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
+    # DiagnosticsOnOffCounts(path_to_log, datasets, args)
+    # DiagnosticsPlotOnOffCounts(path_to_on_off_counts = args.ADir+'/OnOffCounts.csv', args=args)
+"""
 fit_results = []
 stackeds = []
 if args.SEDTimeBinFile is not None:   
@@ -124,12 +151,8 @@ else:
     PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
     DiagnosticsOnOffCounts(path_to_log, datasets, args)
     DiagnosticsPlotOnOffCounts(path_to_on_off_counts = args.ADir+'/OnOffCounts.csv', args=args)
+"""
 ##########################################
-
-######### Look for Spectral Variability ##########
-if 'time_bins' in locals() and time_bins:
-    MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
-###########################################
 
 
 ######### Integral Flux ############
@@ -138,23 +161,13 @@ if 'time_bins' in locals() and time_bins:
 # Find what % Crab the source is
 # Write these to log file
 # Note that this is handled for both the case where there are multiple time bins and where there is only one time bin
+WriteIntegralFluxToLog(fit_result, path_to_log)
 if fit_results != []:
     for fit_result, (tmin,tmax) in zip(fit_results, time_bins):
         WriteIntegralFluxToLog(fit_result, path_to_log, tmin=tmin, tmax=tmax)
 else:
-    WriteIntegralFluxToLog(fit_result, path_to_log)
-############################################
-
-
-######### Significance ############
-# Find significance for the source
-# Write to log file
-# Note that this is handled for both the case where there are multiple time bins and where there is only one time bin
-if stackeds != []:
-    for stacked, (tmin,tmax) in zip(stackeds, time_bins):
-        WriteSignificanceToLog(stacked, path_to_log, tmin=tmin, tmax=tmax)
-else:
-    WriteSignificanceToLog(stacked, path_to_log)
+    continue
+    
 ############################################
 
 
@@ -172,6 +185,6 @@ if args.LightCurve == True:
 ######### Write End of Log File ##########
 with open(path_to_log, "a") as f:
     f.write("--------------------------------------------------\n")
-    f.write("Script Runtime: %s minutes \n" % ((time.time() - script_start_time) / 60))
+    f.write(f"Script Runtime: {((time.time() - script_start_time) / 60):.2f} minutes \n")
     f.write("--------------------------------------------------\n")
 #################################################

@@ -82,24 +82,32 @@ def WriteIntegralFluxToLog(fit_result, path_to_log, tmin= None, tmax=None):
     CrabFlux=CrabIntegralFluxPowerLaw(E_l=ufloat(args.IntegralFluxMinEnergy, 0),E_r=ufloat(10000000, 0))
     with open(path_to_log, "a") as f:
         f.write(
-            "Minimum Energy for Integral Flux:" + str(args.IntegralFluxMinEnergy) + " TeV \n"
+            "Minimum Energy for Integral Flux: " + str(args.IntegralFluxMinEnergy) + " TeV \n"
         )
         f.write("Integral Flux: " + str(IntegralFluxResult) + "\n")
         f.write(str(IntegralFluxResult / CrabFlux * 100) + "% Crab" + "\n")
+        f.write("---------------------------------------------------\n")
     return 
 
 def WriteSignificanceToLog(stacked, path_to_log, tmin=None, tmax=None):
-    n_on = stacked.counts.data.sum()
-    n_off = stacked.counts_off.data.sum()
-    alpha = stacked.alpha.data.mean()
+    info_table = stacked.info_table(cumulative = True)
+    print(f"Tutorial version Significance: {info_table['sqrt_ts'][-1]:.2f} sigma")
+    # n_on = stacked.counts.data.sum()
+    # n_off = stacked.counts_off.data.sum()
+    # alpha = stacked.alpha.data.mean()
     with open(path_to_log, "a") as f:
         f.write("--------------------------------------------------\n")
-        f.write(f"Significance for observations from {tmin} to {tmax}\n")
-        f.write("On Counts: " + str(n_on) + "\n")
-        f.write("Off Counts: " + str(n_off) + "\n")
-        f.write("Alpha: " + str(alpha) + "\n")
-        from LiMaSignificance import LMS
-        LiMa = LMS(n_on=n_on, n_off=n_off, alpha=alpha)
-        f.write(f"Significance: {LiMa}\n")
+        if tmin != None and tmax != None:
+            f.write(f"Significance for observations from {tmin} to {tmax}\n")
+        else:
+            f.write(f"Significance\n")
+        
+        # f.write("On Counts: " + str(n_on) + "\n")
+        # f.write("Off Counts: " + str(n_off) + "\n")
+        # f.write("Alpha: " + str(alpha) + "\n")
+        # from LiMaSignificance import LMS
+        # LiMa = LMS(n_on=n_on, n_off=n_off, alpha=alpha)
+        # f.write(f"Significance: {LiMa}\n")
+        # print(f"My version: {LiMa}")
     return
 

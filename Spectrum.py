@@ -24,7 +24,7 @@ def MakeSpectrumFluxPoints(observations, geom, energy_axis, energy_axis_true, on
     # Create empty dataset, background and safe mask makers
     dataset_empty = SpectrumDataset.create(geom=geom, energy_axis_true=energy_axis_true)
     dataset_maker = SpectrumDatasetMaker(
-        selection=["counts", "exposure", "edisp"], containment_correction=False
+        selection=["counts", "exposure", "edisp"], containment_correction=False # Change to True if you want to use full-enclosure DL3 files.
     )
     # Containment correction False because otherwise get: ValueError: Cannot apply containment correction for point-like IRF.
     bkg_maker = ReflectedRegionsBackgroundMaker(exclusion_mask=exclusion_mask)
@@ -34,7 +34,7 @@ def MakeSpectrumFluxPoints(observations, geom, energy_axis, energy_axis_true, on
     for obs in observations:
         obs_id = str(obs.obs_id)
         dataset = dataset_maker.run(
-            dataset_empty.copy(name=obs_id), obs
+            dataset_empty.copy(name=str(obs_id)), obs
         )  # includes total counts but no background regions etc yet
         dataset = bkg_maker.run(
             dataset, obs

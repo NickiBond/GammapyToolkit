@@ -1,5 +1,5 @@
 from importer import *
-
+"""
 def LMS(n_on, n_off, alpha):
     #Calculate the Li & Ma significance https://www.mpe.mpg.de/~ste/data/aa0839.pdf (Eq4)
     #If using gammapy this should give same result as stats.WStatCountsStatistic(n_on=n_on, n_off=n_off, alpha=alpha).sqrt_ts
@@ -8,6 +8,8 @@ def LMS(n_on, n_off, alpha):
         + n_off * np.log(((1 + alpha) * n_off) / (n_on + n_off))
     ) ** (1 / 2)
     return S
+"""
+
 
 """
 if __name__ == "__main__":

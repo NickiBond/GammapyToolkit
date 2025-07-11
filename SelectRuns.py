@@ -10,7 +10,7 @@ def SelectRuns(path_to_log, args):
     with redirect_stdout(buf):
         data_store.info()   
     # Write the captured output to the log file
-    f.write(buf.getvalue() + "\n")
+    f.write(buf.getvalue())
     f.write("Data Selection:\n")
     obs_table = data_store.obs_table
     obs_table.sort('OBS_ID')
