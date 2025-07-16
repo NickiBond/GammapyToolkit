@@ -3,7 +3,7 @@ from importer import *
 def SpectrumTimeBins(args):
     time_bins = []
     try:
-        with open(args.SEDTimeBinFile, "r") as tbfile:
+        with open(args.SpectralVariabilityTimeBinFile, "r") as tbfile:
             for line in tbfile:
                 line = line.split("#")[0].strip()
                 if not line:  # skip empty/comment-only lines

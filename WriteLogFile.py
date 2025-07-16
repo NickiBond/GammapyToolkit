@@ -57,7 +57,7 @@ def WriteInputParametersToLog(path_to_log):
             "LightCurveComparisonPoints: " + str(args.LightCurveComparisonPoints) + "\n"
         )
         f.write("LightCurveComparisonULs: " + str(args.LightCurveComparisonULs) + "\n")
-        f.write("SEDTimeBinFile: " + str(args.SEDTimeBinFile) + "\n")
+        f.write("SpectralVariabilityTimeBinFile: " + str(args.SpectralVariabilityTimeBinFile) + "\n")
         f.write("--------------------------------------------------\n")
 
 

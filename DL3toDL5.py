@@ -99,7 +99,7 @@ fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusio
 
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
-if args.SEDTimeBinFile is not None:   
+if args.SpectralVariabilityTimeBinFile is not None:   
     time_bins = SpectrumTimeBins(args)
     for i, (tmin, tmax) in enumerate(time_bins):
         with open(path_to_log, "a") as f:
@@ -127,7 +127,7 @@ if args.SEDTimeBinFile is not None:
 """
 fit_results = []
 stackeds = []
-if args.SEDTimeBinFile is not None:   
+if args.SpectralVariabilityTimeBinFile is not None:   
     time_bins = SpectrumTimeBins(args)
     for i, (tmin, tmax) in enumerate(time_bins):
         with open(path_to_log, "a") as f:

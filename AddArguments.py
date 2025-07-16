@@ -107,8 +107,8 @@ def get_parser():
         default=0.2,
     )
     parser.add_argument(
-        "-SEDTimeBinFile",
-        help="Path to the SED time bin file. If provided, the SED will be computed for each time bin to analyse spectral variability. \nIf not provided, SED will be computed for entire time interval. \nThe time bins must be in the format: 'start_time end_time'.",
+        "-SpectralVariabilityTimeBinFile",
+        help="Path to the Spectral Variability time bin file. If provided, the Spectral Variability will be computed for each time bin to analyse spectral variability. \nIf not provided, Spectral Variability will be computed for entire time interval. \nThe time bins must be in the format: 'start_time end_time'.",
         type=str,
         required=False,
         default=None,
