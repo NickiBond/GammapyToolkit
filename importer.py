@@ -50,7 +50,7 @@ from gammapy.makers import (
     SafeMaskMaker,
 )
 from gammapy.modeling import Fit
-from gammapy.modeling.models import PowerLawSpectralModel, SkyModel, Models
+from gammapy.modeling.models import PowerLawSpectralModel, SkyModel, Models, LogParabolaSpectralModel, BrokenPowerLawSpectralModel, SmoothBrokenPowerLawSpectralModel
 from gammapy.estimators import FluxPointsEstimator, LightCurveEstimator
 from gammapy.visualization import plot_spectrum_datasets_off_regions
 
