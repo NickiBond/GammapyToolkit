@@ -54,6 +54,10 @@ from gammapy.modeling.models import PowerLawSpectralModel, SkyModel, Models
 from gammapy.estimators import FluxPointsEstimator, LightCurveEstimator
 from gammapy.visualization import plot_spectrum_datasets_off_regions
 
+# Warnings
+warnings.filterwarnings("ignore")
+
+"""
 # My Scripts
 from SpectralModels import (
     PowerLawFunction,
@@ -94,12 +98,10 @@ from LightCurve import (
     PlotLightCurve,
 )
 from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
-# Warnings
-warnings.filterwarnings("ignore")
+
 
 from DataReduction import *
-
+"""
 # Plot Style
 style.use("tableau-colorblind10")
-
 

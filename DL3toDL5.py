@@ -30,6 +30,21 @@ import sys
 
 sys.path.append("/Users/nickibond/Documents/Research/Toolkit")
 from importer import *
+from AddArguments import get_parser
+from WriteLogFile import WritePackageVersionsToLog, WriteInputParametersToLog, WriteIntegralFluxToLog
+from SelectRuns import SelectRuns
+from Diagnostics import (
+    DiagnosticsTotalTimeStats,
+    DiagnosticsDeadtimeDistribution,
+    DiagnosticsPointingOffsetDistribution,
+    DiagnosticsPeekAtIRFs,
+    DiagnosticsPeekAtEvents,
+)
+from EnergyAxes import EnergyAxes
+from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask
+from DataReduction import RunDataReductionChain
+from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
+from LightCurve import MakeLightCurve, PlotLightCurve
 
 args = get_parser().parse_args()
 cmd_line_args = ' '.join(sys.argv)
@@ -95,7 +110,7 @@ exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axi
 
 ########### Data Reduction Chain: Significance and Spectrum ############
 # Note this is done with whole dataset (i.e. before we remove areas with higher systematics)
-fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args)
+fit_result, datasets = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args)
 
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
@@ -116,7 +131,7 @@ if args.SpectralVariabilityTimeBinFile is not None:
             with open(path_to_log, "a") as f:
                 f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
             continue
-        fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, tmin=tmin, tmax=tmax)
+        fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, tmin=tmin, tmax=tmax)[0]
         fit_results.append(fit_result)
     ######### Look for Spectral Variability ##########
     MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
@@ -161,13 +176,10 @@ else:
 # Find what % Crab the source is
 # Write these to log file
 # Note that this is handled for both the case where there are multiple time bins and where there is only one time bin
-WriteIntegralFluxToLog(fit_result, path_to_log)
+WriteIntegralFluxToLog(fit_result, args, path_to_log)
 if fit_results != []:
     for fit_result, (tmin,tmax) in zip(fit_results, time_bins):
-        WriteIntegralFluxToLog(fit_result, path_to_log, tmin=tmin, tmax=tmax)
-else:
-    continue
-    
+        WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin=tmin, tmax=tmax)
 ############################################
 
 
@@ -178,7 +190,7 @@ else:
 # Also plot LC with ED points if provided
 if args.LightCurve == True:
     lc = MakeLightCurve(path_to_log=path_to_log, datasets=datasets, args=args)
-    PlotLightCurve(lc, path_to_log=path_to_log, args=args)
+    #PlotLightCurve(lc, path_to_log=path_to_log, args=args)
 ##############################################
 
 

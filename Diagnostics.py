@@ -90,8 +90,8 @@ def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
     # Generate and save IRF plots
     with open(path_to_log, "a") as f:
         f.write("Peek at IRFs for first 10 observations (or all observations if less than 10):\n")
-        if len(observations) < 10:
-            for obs in observations:
+        for i, obs in enumerate(observations):
+            if i < 10 or args.Debug:  # Limit to 10 datasets for plotting to save time unless Debug is set to True
                 obs.peek(figsize=(25, 5))
                 fig = plt.gcf()  # Get the current figure
                 obs_id = obs.obs_id
@@ -100,17 +100,6 @@ def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
                 fig.savefig(filepath, bbox_inches="tight")
                 f.write(f"Saved IRF figure for Obs ID {obs_id} to {filepath}\n")
                 plt.close(fig)
-        else:
-            for obs in observations[:10]:
-                obs.peek(figsize=(25, 5))
-                fig = plt.gcf()  # Get the current figure
-                obs_id = obs.obs_id
-                filename = f"irf_obs_{obs_id}.png"
-                filepath = os.path.join(irf_dir, filename)
-                fig.savefig(filepath, bbox_inches="tight")
-                f.write(f"Saved IRF figure for Obs ID {obs_id} to {filepath}\n")
-                plt.close(fig)
-    return
 
 def DiagnosticsPeekAtEvents(path_to_log, observations, args):
     event_dir = os.path.join(args.ADir, "Event_Plots")
@@ -119,8 +108,8 @@ def DiagnosticsPeekAtEvents(path_to_log, observations, args):
     with open(path_to_log, "a") as f:
         f.write("--------------------------------------------------\n")
         f.write("Peek at Events for first 10 observations (or all observations if less than 10):\n")
-        if len(observations) < 10:
-            for obs in observations:
+        for i, obs in enumerate(observations):
+            if i < 10 or args.Debug:  # Limit to 10 datasets for plotting to save time unless Debug is set to True
                 obs.events.peek()
                 fig = plt.gcf()  # Get the current figure
                 obs_id = obs.obs_id
@@ -129,16 +118,7 @@ def DiagnosticsPeekAtEvents(path_to_log, observations, args):
                 fig.savefig(filepath, bbox_inches="tight")
                 f.write(f"Saved Event figure for Obs ID {obs_id} to {filepath}\n")
                 plt.close(fig)
-        else:
-            for obs in observations[:10]:
-                obs.events.peek()
-                fig = plt.gcf()  # Get the current figure
-                obs_id = obs.obs_id
-                filename = f"event_obs_{obs_id}.png"
-                filepath = os.path.join(event_dir, filename)
-                fig.savefig(filepath, bbox_inches="tight")
-                f.write(f"Saved Event figure for Obs ID {obs_id} to {filepath}\n")
-                plt.close(fig)
+                i += 1
     return
 
 def DiagnosticsOnOffCounts(path_to_log, datasets, args):

@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("/Users/nickibond/Documents/Research/Toolkit")
 from importer import *
-
+from AddArguments import get_parser
 args = get_parser().parse_args()
 
 
@@ -61,32 +61,36 @@ def WriteInputParametersToLog(path_to_log):
         f.write("--------------------------------------------------\n")
 
 
-def WriteIntegralFluxToLog(fit_result, path_to_log, tmin= None, tmax=None):
+def WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin= None, tmax=None):
     if tmin != None and tmax != None:
         with open(path_to_log, "a") as f:
             f.write("Integral Flux for time bin " + str(tmin) + " to " + str(tmax) + ":  \n")
     else:
         with open(path_to_log, "a") as f:
+            f.write("-----------------------------------\n")
             f.write("Integral Flux: \n")
-    IntegralFluxResult = DefiniteIntegralPowerLaw(
-        E_l=ufloat(args.IntegralFluxMinEnergy, 0),
-        E_r=ufloat(10000000, 0),
-        Gamma=ufloat(fit_result.parameters["index"].value, fit_result.parameters["index"].error),
-        Phi_0=ufloat(
-            fit_result.parameters["amplitude"].value, fit_result.parameters["amplitude"].error
-        ),
-        E_0=ufloat(
-            fit_result.parameters["reference"].value, fit_result.parameters["reference"].error
-        ),
-    )
-    CrabFlux=CrabIntegralFluxPowerLaw(E_l=ufloat(args.IntegralFluxMinEnergy, 0),E_r=ufloat(10000000, 0))
-    with open(path_to_log, "a") as f:
-        f.write(
-            "Minimum Energy for Integral Flux: " + str(args.IntegralFluxMinEnergy) + " TeV \n"
-        )
-        f.write("Integral Flux: " + str(IntegralFluxResult) + "\n")
-        f.write(str(IntegralFluxResult / CrabFlux * 100) + "% Crab" + "\n")
-        f.write("---------------------------------------------------\n")
+            flux,flux_err = fit_result.models[args.ObjectName].spectral_model.integral_error(args.IntegralFluxMinEnergy *u.TeV, 5000*u.TeV)
+            f.write(f"Integral flux > {args.IntegralFluxMinEnergy}: {flux.value:.2} +/- {flux_err.value:.2} {flux.unit}")
+    # IntegralFluxResult = DefiniteIntegralPowerLaw(
+    #     E_l=ufloat(args.IntegralFluxMinEnergy, 0),
+    #     E_r=ufloat(10000000, 0),
+    #     Gamma=ufloat(fit_result.parameters["index"].value, fit_result.parameters["index"].error),
+    #     Phi_0=ufloat(
+    #         fit_result.parameters["amplitude"].value, fit_result.parameters["amplitude"].error
+    #     ),
+    #     E_0=ufloat(
+    #         fit_result.parameters["reference"].value, fit_result.parameters["reference"].error
+    #     ),
+    # )
+    
+    # CrabFlux=CrabIntegralFluxPowerLaw(E_l=ufloat(args.IntegralFluxMinEnergy, 0),E_r=ufloat(10000000, 0))
+    # with open(path_to_log, "a") as f:
+    #     f.write(
+    #         "Minimum Energy for Integral Flux: " + str(args.IntegralFluxMinEnergy) + " TeV \n"
+    #     )
+    #     f.write("Integral Flux: " + str(IntegralFluxResult) + "\n")
+    #     f.write(str(IntegralFluxResult / CrabFlux * 100) + "% Crab" + "\n")
+    #     f.write("---------------------------------------------------\n")
     return 
 
 def WriteSignificanceToLog(stacked, path_to_log, tmin=None, tmax=None):

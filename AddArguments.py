@@ -1,10 +1,15 @@
 import argparse
 
-
 def get_parser():
     parser = argparse.ArgumentParser(
         description="DL3 to Dl5 in Gammapy\narguments are as follows: \n",
         formatter_class=argparse.RawTextHelpFormatter,
+    )
+
+    parser.add_argument(
+        "-Debug",
+        help="Make all the debugging plots (i.e. for some plots 1 per run rather than the max of 10). Note: this slows down analysis.Default is False.",
+        action="store_true"
     )
 
     # Data Selection Parameters
@@ -17,9 +22,7 @@ def get_parser():
     parser.add_argument(
         "-IncludeNearby",
         help="Include observations of sources within 5 deg of <ObjectName> in the analysis. default= False",
-        type=bool,
-        required=False,
-        default=False,
+        action="store_true",
     )
     parser.add_argument(
         "-DL3Path",
@@ -91,6 +94,189 @@ def get_parser():
         required=False,
         default=10,
     )
+    
+    # Spectral Model Parameters
+    # Power Law Parameters
+    subparsers = parser.add_subparsers(dest="SpectralModel", required=True, help="Choose a spectral model")
+    powerlaw_parser = subparsers.add_parser(
+        "PowerLaw", help="Use a Power Law Spectral Model with default parameters"
+    )
+    powerlaw_parser.add_argument(
+        "-PowerLawIndex",
+        help="Index of the Power Law Spectral Model, default =2.0",
+        default=2.0,
+        type=float,
+        required=False,
+    )
+    powerlaw_parser.add_argument(
+        "-PowerLawAmplitude",
+        help="Amplitude of the Power Law Spectral Model in cm-2 s-1 TeV-1, default =1e-12",
+        default=1e-12,
+        type=float,
+        required=False,
+    )
+    powerlaw_parser.add_argument(
+        "-PowerLawReferenceEnergy",
+        help="Reference Energy of the Power Law Spectral Model in TeV, default =1.0",
+        default=1.0 ,
+        type=float,
+        required=False,
+    )
+    ## Power Law with Exponential Cut Off Parameters
+    powerlaw_cutoff_parser = subparsers.add_parser(
+        "PowerLawCutOff",
+        help="Use a Power Law with Exponential Cut Off Spectral Model with default parameters",
+    )
+    powerlaw_cutoff_parser.add_argument(
+        "-PowerLawCutOffIndex",
+        help="Index of the Power Law with Exponential Cut Off Spectral Model, default =2.0",
+        default=1.5,
+        type=float,
+        required=False,
+    )
+    powerlaw_cutoff_parser.add_argument(
+        "-PowerLawCutOffAmplitude",
+        help="Amplitude of the Power Law with Exponential Cut Off Spectral Model in cm-2 s-1 TeV-1, default =1e-12",
+        default=1e-12,
+        type=float,
+        required=False,
+    )
+    powerlaw_cutoff_parser.add_argument(
+        "-PowerLawCutOffReferenceEnergy",
+        help="Reference Energy of the Power Law with Exponential Cut Off Spectral Model in TeV, default =1.0",
+        default=1.0,
+        type=float,
+        required=False,
+    )
+    powerlaw_cutoff_parser.add_argument(
+        "-PowerLawCutOffAlpha",
+        help="Alpha of the Power Law with Exponential Cut Off Spectral Model, default =1.0",
+        default=1.0,
+        type=float,
+        required=False,
+    )
+    powerlaw_cutoff_parser.add_argument(
+        "-PowerLawCutOffLambda",
+        help="Lambda of the Power Law with Exponential Cut Off Spectral Model in units of TeV-1, default =0.1",
+        default=0.1,
+        type=float,
+        required=False,
+    )
+    # Broken PowerLaw
+    broken_powerlaw_parser = subparsers.add_parser(
+        "BrokenPowerLaw",
+        help="Use a Broken Power Law Spectral Model with default parameters",
+    )
+    broken_powerlaw_parser.add_argument(
+        "-BrokenPowerLawIndex1",
+        help="Index of the first segment of the Broken Power Law Spectral Model, default =2.0",
+        default=2.0,
+        type=float,
+        required=False,
+    )
+    broken_powerlaw_parser.add_argument(
+        "-BrokenPowerLawIndex2",
+        help="Index of the second segment of the Broken Power Law Spectral Model, default =2.0",
+        default=2.0,
+        type=float,
+        required=False,
+    )
+    broken_powerlaw_parser.add_argument(
+        "-BrokenPowerLawAmplitude",
+        help="Amplitude of the Broken Power Law Spectral Model in cm-2 s-1 TeV-1, default =1e-12",
+        default=1e-12,
+        type=float,
+        required=False,
+    )
+    broken_powerlaw_parser.add_argument(
+        "-BrokenPowerLawEnergyBreak",
+        help="Energy Break of the Broken Power Law Spectral Model in TeV, default =1.0",
+        default=1.0,
+        type=float,
+        required=False,
+    )
+
+    log_parabola_parser = subparsers.add_parser(
+        "LogParabola",
+        help="Use a Log Parabola Spectral Model with default parameters",
+    )
+    log_parabola_parser.add_argument(
+        "-LogParabolaAmplitude",
+        help="Amplitude of the Log Parabola Spectral Model in cm-2 s-1 TeV-1, default =1e-12",
+        default=1e-12,
+        type=float,
+        required=False,
+    )
+    log_parabola_parser.add_argument(
+        "-LogParabolaReferenceEnergy",
+        help="Reference Energy of the Log Parabola Spectral Model in TeV, default =10",
+        default=10.0,
+        type=float,
+        required=False,
+    )
+    log_parabola_parser.add_argument(
+        "-LogParabolaAlpha",
+        help="Alpha of the Log Parabola Spectral Model, default = 2.0",
+        default=2.0,
+        type=float,
+        required=False,
+    )
+    log_parabola_parser.add_argument(
+        "-LogParabolaBeta",
+        help="Beta of the Log Parabola Spectral Model, default = 1.0",
+        default=1.0,
+        type=float,
+        required=False,
+    )
+
+    # Smooth Broken Power Law
+    smooth_broken_powerlaw_parser = subparsers.add_parser(
+        "SmoothBrokenPowerLaw",
+        help="Use a Smooth Broken Power Law Spectral Model with default parameters",
+    )
+    smooth_broken_powerlaw_parser.add_argument(
+        "-SmoothBrokenPowerLawIndex1",
+        help="Index of the first segment of the Smooth Broken Power Law Spectral Model, default =2.0",
+        default=2.0,
+        type=float,
+        required=False,
+    )
+    smooth_broken_powerlaw_parser.add_argument(
+        "-SmoothBrokenPowerLawIndex2",
+        help="Index of the second segment of the Smooth Broken Power Law Spectral Model, default =2.0",
+        default=2.0,
+        type=float,
+        required=False,
+    )
+    smooth_broken_powerlaw_parser.add_argument(
+        "-SmoothBrokenPowerLawAmplitude",
+        help="Amplitude of the Smooth Broken Power Law Spectral Model in cm-2 s-1 TeV-1, default =1e-12",
+        default=1e-12,
+        type=float,
+        required=False,
+    )
+    smooth_broken_powerlaw_parser.add_argument(
+        "-SmoothBrokenPowerLawEnergyBreak",
+        help="Energy Break of the Smooth Broken Power Law Spectral Model in TeV, default =1.0",
+        default=1.0,
+        type=float,
+        required=False,
+    )
+    smooth_broken_powerlaw_parser.add_argument(
+        "-SmoothBrokenPowerLawEnergyReference",
+        help="Energy Reference of the Smooth Broken Power Law Spectral Model in TeV, default =1",
+        default=1.0,
+        type=float,
+        required=False,
+    )
+
+    smooth_broken_powerlaw_parser.add_argument(
+        "-SmoothBrokenPowerLawBeta",
+        help="Beta of the Smooth Broken Power Law Spectral Model, default =1.0",
+        default=1.0,
+        type=float,
+        required=False,
+    )
 
     # SED Parameters
     parser.add_argument(
@@ -118,9 +304,7 @@ def get_parser():
     parser.add_argument(
         "-LightCurve",
         help="Find Light Curve points and plot. default= False. Set to False to reduce runtime",
-        type=bool,
-        required=False,
-        default=False,
+        action="store_true",
     )
     parser.add_argument(
         "-LightCurveBinDuration",
