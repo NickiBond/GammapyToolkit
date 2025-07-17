@@ -31,7 +31,7 @@ def MakeLightCurve(path_to_log, datasets, args):
     f.write("Light Curve Flux Points saved to " + args.ADir + "/LightCurve.ecsv\n")
     f.write("To open: \n")
     f.write("from astropy.table import Table \n")
-    f.write("LC = Table.read( +'" + args.ADir + "LightCurve.ecsv', format='ascii.ecsv') \n")
+    f.write(f"LC = Table.read({args.ADir}/LightCurve.ecsv, format='ascii.ecsv') \n")
     f.write("--------------------------------------------------\n")
     f.close()
     """
