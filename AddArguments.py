@@ -71,6 +71,13 @@ def get_parser():
         required=False,
         default=0.07071068,
     )
+    parser.add_argument(
+        "-BackgroundMaker",
+        help="Background maker to use. Options are 'ReflectedRegions' or 'RingBackground'.",
+        type=str,
+        required=False,
+        default="ReflectedRegions",
+    )
 
     # Energy Axis Parameters
     parser.add_argument(
