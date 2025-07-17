@@ -87,6 +87,10 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         energy_edges = energy_axis.edges,
         source = str(args.ObjectName),
         selection_optional = "all",
+        # The lines below are due to a bug in gammapy to do with how it fits non-detection points. This is a workaround for now. 
+        norm.min=-1e2,
+        norm.max=1e2,
+        norm.scan_values=np.array(np.linspace(-10,10,10))
         ).run(datasets=datasets)
     flux_points.to_table().write(
             os.path.join(WorkingDir, "SED.ecsv"), overwrite=True
