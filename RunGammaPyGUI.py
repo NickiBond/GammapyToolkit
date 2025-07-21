@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, ttk
+import tkinter.messagebox
 import subprocess
 from PIL import Image, ImageTk
 
@@ -27,7 +28,15 @@ help_dict = {
     "LightCurveSelectionOptional": "Optional steps for light curve processing (e.g. 'all', 'ul', 'scan').",
     "LightCurveComparisonPoints": "CSV file with points for light curve comparison.",
     "LightCurveComparisonULs": "CSV file with upper limits for comparison.",
-    "IncludeNearby": "Include observations of sources within 5 deg of ObjectName in the analysis. default= False"
+    "IncludeNearby": "Include observations of sources within 5 deg of ObjectName in the analysis. default= False",
+     "SpectralModel": "Choose the spectral model: PowerLaw, LogParabola, or ExpCutoffPowerLaw.",
+    "Index": "Spectral index for PowerLaw or ExpCutoffPowerLaw.",
+    "Amplitude": "Amplitude at reference energy in cm^-2 s^-1 TeV^-1.",
+    "Reference": "Reference energy in TeV for PowerLaw.",
+    "Alpha": "Alpha parameter for LogParabola.",
+    "Beta": "Beta parameter for LogParabola.",
+    "E_0": "Reference energy E_0 for LogParabola or cutoff energy for ExpCutoffPowerLaw.",
+    "Lambda_": "Cutoff parameter lambda for ExpCutoffPowerLaw."
 }
 
 # --- Tooltip class ---
@@ -78,16 +87,48 @@ def browse_file(entry):
         entry.insert(0, path)
 
 # --- Script execution ---
+import json
+import os
+
 def run_script():
+    if entries["ObjectName"].get().strip() == "":
+        tk.messagebox.showerror("Input Error", "Object Name is required.")
+        return
+
     args = [
         "/Users/nickibond/NBvenv/bin/python",
         "/Users/nickibond/Documents/Research/Toolkit/DL3toDL5.py"
     ]
+
+    saved_data = {}
+
     for key, widget in entries.items():
-        value = widget.get()
+        value = widget.get().strip()
+        saved_data[key] = value
         if value != "":
             args += [f"-{key}", value]
-    args += ["-LightCurve", str(lightcurve_var.get())]        
+
+    # Booleans
+    saved_data["LightCurve"] = lightcurve_var.get()
+    args += ["-LightCurve", str(lightcurve_var.get())]
+    
+    saved_data["IncludeNearby"] = include_nearby_var.get()
+    if include_nearby_var.get():
+        args += ["-IncludeNearby"]
+
+    # Spectral model
+    saved_data["SpectralModel"] = spectral_model_var.get()
+    args += ["-SpectralModel", spectral_model_var.get()]
+    for key, (label, entry) in spectral_entries.items():
+        val = entry.get().strip()
+        saved_data[key] = val
+        if val != "":
+            args += [f"-{key}", val]
+
+    # Save arguments to file
+    with open("last_used_args.json", "w") as f:
+        json.dump(saved_data, f, indent=2)
+
     subprocess.run(args, cwd="/Users/nickibond/Documents")
 
 # --- Show help ---
@@ -104,12 +145,25 @@ def show_help():
     scrollbar.pack(side="right", fill="y")
     text.config(yscrollcommand=scrollbar.set)
 
+# --- Reset form ---
+def reset_form():
+    for entry in entries.values():
+        entry.delete(0, tk.END)
+    for _, entry in spectral_entries.values():
+        entry.delete(0, tk.END)
+    lightcurve_var.set(False)
+    include_nearby_var.set(False)
+    spectral_model_var.set("PowerLaw")
+    update_spectral_fields()
+    if os.path.exists("last_used_args.json"):
+        os.remove("last_used_args.json")
+
 # --- GUI setup ---
 root = tk.Tk()
 root.title("DL3 to DL5 GUI")
 entries = {}
 
-image = Image.open("/Users/nickibond/Documents/Research/GammaPyApp/ChatGPTGammaPyScriptLogo.png")
+image = Image.open("/Users/nickibond/Documents/Research/Toolkit/ChatGPTGammaPyScriptLogo.png")
 resized_image = image.resize((480,480), Image.LANCZOS)
 logo = ImageTk.PhotoImage(resized_image)
 
@@ -201,6 +255,65 @@ add_entry(f, "LC Selection Optional", "LightCurveSelectionOptional", "", row=5)
 add_entry(f, "LC Comparison Points (CSV)", "LightCurveComparisonPoints", "", browse=True, row=6)
 add_entry(f, "LC Comparison ULs (CSV)", "LightCurveComparisonULs", "", browse=True, row=7)
 
+# --- Spectral Model tab ---
+f = ttk.Frame(notebook)
+notebook.add(f, text="Spectral Model")
+frames["Spectral Model"] = f
+
+spectral_model_var = tk.StringVar(value="PowerLaw")  # Default selection
+
+tk.Label(f, text="Spectral Model").grid(row=0, column=0, sticky="e", padx=5, pady=2)
+model_menu = ttk.Combobox(f, textvariable=spectral_model_var, values=["PowerLaw", "LogParabola", "ExpCutoffPowerLaw"])
+model_menu.grid(row=0, column=1, sticky="w", padx=5, pady=2)
+CreateToolTip(model_menu, "Select the spectral model for SED fitting.")
+
+spectral_entries = {}
+
+def add_spectral_entry(label_text, key, row, default=""):
+    label = tk.Label(f, text=label_text)
+    entry = tk.Entry(f, width=20)
+    entry.insert(0, default)
+    label.grid(row=row, column=0, sticky="e", padx=5, pady=2)
+    entry.grid(row=row, column=1, sticky="w", padx=5, pady=2)
+    CreateToolTip(entry, help_dict.get(key, f"{label_text} for selected spectral model."))
+    spectral_entries[key] = (label, entry)
+
+# Define fields (shown conditionally based on model)
+add_spectral_entry("Index", "Index", row=1)
+add_spectral_entry("Amplitude", "Amplitude", row=2)
+add_spectral_entry("Reference (TeV)", "Reference", row=3)
+
+add_spectral_entry("Alpha", "Alpha", row=4)
+add_spectral_entry("Beta", "Beta", row=5)
+add_spectral_entry("E_0 (TeV)", "E_0", row=6)
+
+add_spectral_entry("Lambda", "Lambda_", row=7)
+
+def update_spectral_fields(*args):
+    model = spectral_model_var.get()
+
+    for label, entry in spectral_entries.values():
+        label.grid_remove()
+        entry.grid_remove()
+
+    if model == "PowerLaw":
+        for key in ["Index", "Amplitude", "Reference"]:
+            spectral_entries[key][0].grid()
+            spectral_entries[key][1].grid()
+    elif model == "LogParabola":
+        for key in ["Alpha", "Beta", "Amplitude", "E_0"]:
+            spectral_entries[key][0].grid()
+            spectral_entries[key][1].grid()
+    elif model == "ExpCutoffPowerLaw":
+        for key in ["Index", "Amplitude", "Reference", "Lambda_", "E_0"]:
+            spectral_entries[key][0].grid()
+            spectral_entries[key][1].grid()
+
+# Bind dropdown change to the function
+model_menu.bind("<<ComboboxSelected>>", update_spectral_fields)
+update_spectral_fields()  # Initialize view
+
+
 # --- Help menu ---
 menu_bar = tk.Menu(root)
 root.config(menu=menu_bar)
@@ -210,5 +323,27 @@ help_menu.add_command(label="Show Help", command=show_help)
 
 tk.Button(buttons_frame, text="Run DL3toDL5", command=run_script, bg="#4CAF50", fg="blue", padx=10, pady=5).pack(side="left", padx=10)
 tk.Button(buttons_frame, text="Help", command=show_help, bg="#2196F3", fg="red", padx=10, pady=5).pack(side="left", padx=10)
+tk.Button(buttons_frame, text="Reset", command=reset_form, bg="#f436c8", fg="black", padx=10, pady=5).pack(side="left", padx=10)
+
+def load_saved_args():
+    if os.path.exists("last_used_args.json"):
+        with open("last_used_args.json", "r") as f:
+            data = json.load(f)
+        for key, val in data.items():
+            if key in entries:
+                entries[key].delete(0, tk.END)
+                entries[key].insert(0, val)
+            elif key == "LightCurve":
+                lightcurve_var.set(val)
+            elif key == "IncludeNearby":
+                include_nearby_var.set(val)
+            elif key == "SpectralModel":
+                spectral_model_var.set(val)
+                update_spectral_fields()
+            elif key in spectral_entries:
+                spectral_entries[key][1].delete(0, tk.END)
+                spectral_entries[key][1].insert(0, val)
+
+load_saved_args()
 
 root.mainloop()

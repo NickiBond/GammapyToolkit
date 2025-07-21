@@ -27,7 +27,7 @@ from matplotlib.collections import PolyCollection
 import astropy
 import astropy.units as u
 from astropy.table import Table
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 from astropy.coordinates import SkyCoord, angular_separation
 
 # Regions & Sky
@@ -42,7 +42,7 @@ from astroquery.vizier import Vizier
 import gammapy
 from gammapy import stats
 from gammapy.data import DataStore
-from gammapy.maps import MapAxis, RegionGeom, WcsGeom
+from gammapy.maps import MapAxis, RegionGeom, WcsGeom, TimeMapAxis
 from gammapy.datasets import SpectrumDataset, Datasets, FluxPointsDataset
 from gammapy.makers import (
     SpectrumDatasetMaker,

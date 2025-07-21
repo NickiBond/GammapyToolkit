@@ -57,6 +57,10 @@ cmd_line_args = ' '.join(sys.argv)
 # Write the packages used to the log file.
 # Write the input parameters to the log file
 os.makedirs(args.ADir, exist_ok=True)
+os.makedirs(args.ADir + "/Diagnostics", exist_ok=True)
+os.makedirs(args.ADir + "/Spectrum", exist_ok=True)
+os.makedirs(args.ADir + "/LightCurve", exist_ok=True)
+os.makedirs(args.ADir + "/SpectralVariability", exist_ok=True)
 path_to_log = args.ADir + "/log.txt"
 with open(path_to_log, "w") as f:
     f.write("Log file for DL3toDL5.py\n")

@@ -20,12 +20,12 @@ def DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args):
         plt.xlabel("Deadtime")
         plt.ylabel("Number of Observations")
         plt.title(f'1 - obstable["DEADC"] Distribution')
-        plt.savefig(args.ADir + "/DeadtimeDistribution.pdf")
+        plt.savefig(args.ADir + "/Diagnostics/DeadtimeDistribution.pdf")
         plt.close()
         f.write(
             "Deadtime Distribution saved to "
             + args.ADir
-            + "/DeadtimeDistribution.pdf\n"
+            + "/Diagnostics/DeadtimeDistribution.pdf\n"
         )
     return
 
@@ -45,12 +45,12 @@ def DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args):
         plt.xlabel(f"Angular Separation (deg)")
         plt.title(f"Pointing Offset Distribution")
         plt.ylabel("Number of Observations")
-        plt.savefig(args.ADir + "/PointingOffsetHistogram.pdf")
+        plt.savefig(args.ADir + "/Diagnostics/PointingOffsetHistogram.pdf")
         plt.close()
         f.write(
             "Pointing Offset Distribution saved to "
             + args.ADir
-            + "/PointingOffsetHistogram.pdf\n"
+            + "/Diagnostics/PointingOffsetHistogram.pdf\n"
         )
         f.write(
             "Mean Pointing Offset: "
@@ -85,7 +85,7 @@ def DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args):
 
 
 def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
-    irf_dir = os.path.join(args.ADir, "IRF_Plots")
+    irf_dir = os.path.join(args.ADir, "Diagnostics", "IRF_Plots")
     os.makedirs(irf_dir, exist_ok=True)
     # Generate and save IRF plots
     with open(path_to_log, "a") as f:
@@ -102,7 +102,7 @@ def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
                 plt.close(fig)
 
 def DiagnosticsPeekAtEvents(path_to_log, observations, args):
-    event_dir = os.path.join(args.ADir, "Event_Plots")
+    event_dir = os.path.join(args.ADir, "Diagnostics/Event_Plots")
     os.makedirs(event_dir, exist_ok=True)
     # Generate and save event plots
     with open(path_to_log, "a") as f:
@@ -140,8 +140,8 @@ def DiagnosticsPlotOnOffCounts(path_to_on_off_counts, args):
     plt.figure()
     plt.hist(on)    
     plt.xlabel("On counts per run")
-    plt.savefig(args.ADir + '/OnCountsPerRunHistogram')
+    plt.savefig(args.ADir + "/Diagnostics/OnCountsPerRunHistogram.pdf")
     plt.figure()
     plt.hist(off)    
     plt.xlabel("Off counts per run")
-    plt.savefig(args.ADir + '/OffCountsPerRunHistogram')
+    plt.savefig(args.ADir + "/Diagnostics/OffCountsPerRunHistogram.pdf")
