@@ -20,7 +20,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.style as style
 import matplotlib.ticker as ticker
-import matplotlib.dates as mdates
 from matplotlib.collections import PolyCollection
 
 # Astropy
@@ -32,7 +31,7 @@ from astropy.coordinates import SkyCoord, angular_separation
 
 # Regions & Sky
 import regions
-from regions import CircleSkyRegion, PointSkyRegion
+from regions import CircleSkyRegion
 
 # Astroquery
 import astroquery
@@ -40,7 +39,6 @@ from astroquery.vizier import Vizier
 
 # Gammapy
 import gammapy
-from gammapy import stats
 from gammapy.data import DataStore
 from gammapy.maps import MapAxis, RegionGeom, WcsGeom, TimeMapAxis
 from gammapy.datasets import SpectrumDataset, Datasets, FluxPointsDataset
@@ -57,51 +55,6 @@ from gammapy.visualization import plot_spectrum_datasets_off_regions
 # Warnings
 warnings.filterwarnings("ignore")
 
-"""
-# My Scripts
-from SpectralModels import (
-    PowerLawFunction,
-    DefiniteIntegralPowerLaw,
-    CrabIntegralFluxPowerLaw,
-)
-from VEGASSpectrum import vegas_spectrum
-from AddArguments import get_parser
-from WriteLogFile import (
-    WritePackageVersionsToLog,
-    WriteInputParametersToLog,
-    WriteIntegralFluxToLog,
-    WriteSignificanceToLog,
-)
-from SelectRuns import SelectRuns
-from Diagnostics import (
-    DiagnosticsTotalTimeStats,
-    DiagnosticsDeadtimeDistribution,
-    DiagnosticsPointingOffsetDistribution,
-    DiagnosticsOnOffCounts,
-    DiagnosticsPlotOnOffCounts,
-    DiagnosticsPeekAtIRFs,
-    DiagnosticsPeekAtEvents
-)
-from EnergyAxes import EnergyAxes
-from GetGeometry import (
-    GetOnRegion,
-    GetExclusionRegions,
-    GetExclusionMask,
-)
-from Spectrum import (
-    SpectrumTimeBins,
-    MakeSpectrumFluxPoints,
-    PlotSpectrum,
-)
-from LightCurve import (
-    MakeLightCurve,
-    PlotLightCurve,
-)
-from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
-
-
-from DataReduction import *
-"""
 # Plot Style
 style.use("tableau-colorblind10")
 

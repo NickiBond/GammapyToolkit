@@ -45,6 +45,8 @@ from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask
 from DataReduction import RunDataReductionChain
 from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
 from LightCurve import MakeLightCurve, PlotLightCurve
+from Spectrum import SpectrumTimeBins
+
 
 args = get_parser().parse_args()
 cmd_line_args = ' '.join(sys.argv)
@@ -141,38 +143,6 @@ if args.SpectralVariabilityTimeBinFile is not None:
     MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
     # flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
     # PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
-    # DiagnosticsOnOffCounts(path_to_log, datasets, args)
-    # DiagnosticsPlotOnOffCounts(path_to_on_off_counts = args.ADir+'/OnOffCounts.csv', args=args)
-"""
-fit_results = []
-stackeds = []
-if args.SpectralVariabilityTimeBinFile is not None:   
-    time_bins = SpectrumTimeBins(args)
-    for i, (tmin, tmax) in enumerate(time_bins):
-        with open(path_to_log, "a") as f:
-            f.write(f"Making SED for observations from {tmin} to {tmax}\n")
-        label = f"timebin_{i}"
-        selected_obs = [
-            obs
-            for obs in observations
-            if obs.tstart.mjd >= tmin and obs.tstop.mjd <= tmax
-        ]
-        if len(selected_obs) == 0:
-            with open(path_to_log, "a") as f:
-                f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
-            continue
-        flux_points_dataset, stacked, info_table, fit_result, datasets = MakeSpectrumFluxPoints(observations = selected_obs, tmin=tmin, tmax=tmax, geom=geom, energy_axis = energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args= args, path_to_log=path_to_log)
-        PlotSpectrum(flux_points_dataset, path_to_log= path_to_log, tmin=tmin, tmax=tmax, args=args)
-        fit_results.append(fit_result)
-        stackeds.append(stacked)
-else:
-    flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
-    PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
-    DiagnosticsOnOffCounts(path_to_log, datasets, args)
-    DiagnosticsPlotOnOffCounts(path_to_on_off_counts = args.ADir+'/OnOffCounts.csv', args=args)
-"""
-##########################################
-
 
 ######### Integral Flux ############
 # Find integral flux for the source

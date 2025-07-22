@@ -20,7 +20,7 @@ def MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args):
         plt.errorbar(MeanTimes, Norm, yerr=NormErr, fmt="o", color="blue")
         plt.xlabel("Time (MJD)")
         plt.ylabel(r"Norm [TeV$^{-1}$ s$^{-1}$ cm$^{-2}$]")
-        plt.savefig(args.ADir + f"SpectralVariability/SpectralVariabilityNorm.pdf")
+        plt.savefig(args.ADir + f"/SpectralVariability/SpectralVariabilityNorm.pdf")
         plt.close()
         plt.figure()
         plt.errorbar(MeanTimes, Index, yerr=IndexErr, fmt="o", color="blue")

@@ -18,7 +18,7 @@ def SpectrumTimeBins(args):
         print(f"Error reading time bin file: {e}")
         sys.exit(1)
     return time_bins
-
+"""
 def MakeSpectrumFluxPoints(observations, geom, energy_axis, energy_axis_true, on_region, exclusion_mask, args, tmin = None, tmax = None, path_to_log = None):
     f = open(path_to_log, "a")
     # Create empty dataset, background and safe mask makers
@@ -118,8 +118,8 @@ def MakeSpectrumFluxPoints(observations, geom, energy_axis, energy_axis_true, on
     f.write("--------------------------------------------------\n")
     f.close()
     return flux_points_dataset, stacked, info_table, fit_result, datasets
-
-
+"""
+"""
 def PlotSpectrum(flux_points_dataset, args, path_to_log, tmin = None, tmax = None):
     plt.figure()
     fig, (ax1, ax2) = plt.subplots(
@@ -197,3 +197,4 @@ def PlotSpectrum(flux_points_dataset, args, path_to_log, tmin = None, tmax = Non
         fig.savefig(args.ADir + "/Spectrum.pdf")
     plt.close()
     return 
+"""

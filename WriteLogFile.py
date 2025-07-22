@@ -92,7 +92,7 @@ def WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin= None, tmax=None)
     #     f.write(str(IntegralFluxResult / CrabFlux * 100) + "% Crab" + "\n")
     #     f.write("---------------------------------------------------\n")
     return 
-
+"""
 def WriteSignificanceToLog(stacked, path_to_log, tmin=None, tmax=None):
     info_table = stacked.info_table(cumulative = True)
     print(f"Tutorial version Significance: {info_table['sqrt_ts'][-1]:.2f} sigma")
@@ -114,4 +114,4 @@ def WriteSignificanceToLog(stacked, path_to_log, tmin=None, tmax=None):
         # f.write(f"Significance: {LiMa}\n")
         # print(f"My version: {LiMa}")
     return
-
+"""
