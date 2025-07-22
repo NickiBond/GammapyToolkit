@@ -4,7 +4,11 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         WorkingDir = os.path.join(args.ADir, f"SpectralVariability/TimeBin_{tmin}_{tmax}")
         os.makedirs(WorkingDir, exist_ok=True)
     else:
-        WorkingDir = os.path.join(args.ADir, "Spectrum")
+        WorkingDir = args.ADir
+    os.makedirs(WorkingDir + "/Diagnostics", exist_ok=True)
+    os.makedirs(WorkingDir + "/Spectrum", exist_ok=True)
+    os.makedirs(WorkingDir + "/LightCurve", exist_ok=True)
+
     dataset_maker = SpectrumDatasetMaker(
     selection=["counts", "exposure", "edisp"]
     )
@@ -59,10 +63,10 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
     plt.legend(["ON region"])
     if tmin != None and tmax != None:
         plt.title(f"Exclusion Regions from {tmin} to {tmax}")
-        plt.savefig(args.ADir + f"/Diagnostics/OnOffExclusionRegionsFrom{tmin}To{tmax}.pdf")
+        plt.savefig(WorkingDir+ f"/Diagnostics/OnOffExclusionRegionsFrom{tmin}To{tmax}.pdf")
     else:
         plt.title("Exclusion Regions")
-        plt.savefig(args.ADir + "/Diagnostics/OnOffExclusionRegions.pdf")
+        plt.savefig(WorkingDir + "/Diagnostics/OnOffExclusionRegions.pdf")
     plt.close()
 
     if args.SpectralModel == "PowerLaw":
@@ -114,7 +118,7 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         f.write("Fit Results:\n" + str(fit_result.models) + "\n")
         f.write("--------------------------------------------------\n")
     # Plot the fit
-    predicted_counts_dir = os.path.join(args.ADir, "Diagnostics", "PredictedCounts")
+    predicted_counts_dir = os.path.join(WorkingDir, "Diagnostics", "PredictedCounts")
     os.makedirs(predicted_counts_dir, exist_ok=True)
     for i, dataset in enumerate(datasets):
         if args.Debug or i < 10:
@@ -135,7 +139,7 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         # norm_values=np.array(np.linspace(-10,10,10))
         ).run(datasets=datasets)
     flux_points.to_table().write(
-            os.path.join(WorkingDir, "SED.ecsv"), overwrite=True
+            os.path.join(WorkingDir, "Spectrum/SED.ecsv"), overwrite=True
         )
     
     # Plot the flux points and best fit spectral model
@@ -143,7 +147,7 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
     data=flux_points, models=datasets.models)
 
     flux_points_dataset.plot_fit()
-    plt.savefig(os.path.join(WorkingDir, "SED_FluxPoints.pdf"))
+    plt.savefig(os.path.join(WorkingDir, "Spectrum/SED_FluxPoints.pdf"))
     return fit_result, datasets
 
 def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=None, tmax=None, safe = True):
@@ -186,11 +190,11 @@ def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, arg
     ax_sqrt_ts.set_ylabel(r"Significance [$\sigma$]")
     with open(path_to_log, "a") as f:
         if safe:
-            plt.savefig(WorkingDir + "/SignificanceAndExcess_Safe.pdf")
-            f.write(f"Saving Figure to {WorkingDir}/SignificanceAndExcess_Safe.pdf\n")
+            plt.savefig(WorkingDir + "/Spectrum/SignificanceAndExcess_Safe.pdf")
+            f.write(f"Saving Figure to {WorkingDir}/Spectrum/SignificanceAndExcess_Safe.pdf\n")
         else:
-            plt.savefig(WorkingDir + "/SignificanceAndExcess_NotSafe.pdf")
-            f.write(f"Saving Figure to {WorkingDir}/SignificanceAndExcess_NotSafe.pdf\n")
+            plt.savefig(WorkingDir + "/Spectrum/SignificanceAndExcess_NotSafe.pdf")
+            f.write(f"Saving Figure to {WorkingDir}/Spectrum/SignificanceAndExcess_NotSafe.pdf\n")
         f.write("--------------------------------------------------\n")
-
+    plt.close()
     return

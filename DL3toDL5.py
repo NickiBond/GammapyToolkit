@@ -95,14 +95,7 @@ DiagnosticsPeekAtEvents(path_to_log, observations, args)
 ########## Define Energy Axes  ##########
 # Define energy axis
 # Define true energy axis
-energy_axis, energy_axis_true = EnergyAxes(args)
-with open(path_to_log, "a") as f:
-    f.write("--------------------------------------------------\n")
-    f.write("Energy Axis: " + str(energy_axis) + "\n")
-    f.write("True Energy Axis: " + str(energy_axis_true) + "\n")
-    f.write("Energy Axis Bin Edges: \n")
-    f.write(str(energy_axis.edges) + "\n")
-    f.write("--------------------------------------------------\n")
+energy_axis, energy_axis_true = EnergyAxes(args, path_to_log)
 ##########################################
 
 
@@ -114,9 +107,11 @@ exclusion_regions = GetExclusionRegions(target_position, args, path_to_log)
 exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axis)
 ##############################################
 
+
 ########### Data Reduction Chain: Significance and Spectrum ############
 # Note this is done with whole dataset (i.e. before we remove areas with higher systematics)
-fit_result, datasets = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args)
+fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args)
+#########################################################
 
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
@@ -124,7 +119,8 @@ if args.SpectralVariabilityTimeBinFile is not None:
     time_bins = SpectrumTimeBins(args)
     for i, (tmin, tmax) in enumerate(time_bins):
         with open(path_to_log, "a") as f:
-            f.write(f"Making SED for observations from {tmin} to {tmax}\n")
+            f.write("--------------------------------------------------\n")
+            f.write(f"Running Data Reduction Chain for observations from {tmin} to {tmax}\n")
         label = f"timebin_{i}"
         selected_obs = [ 
             obs
