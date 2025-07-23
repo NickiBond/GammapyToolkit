@@ -116,10 +116,10 @@ fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
 if args.SpectralVariabilityTimeBinFile is not None:   
+    f.write("--------------------------------------------------\n")
     time_bins = SpectrumTimeBins(args)
     for i, (tmin, tmax) in enumerate(time_bins):
         with open(path_to_log, "a") as f:
-            f.write("--------------------------------------------------\n")
             f.write(f"Running Data Reduction Chain for observations from {tmin} to {tmax}\n")
         label = f"timebin_{i}"
         selected_obs = [ 
@@ -159,7 +159,7 @@ if fit_results != []:
 # Plot light curve
 # Also plot LC with ED points if provided
 if args.LightCurve == True:
-    lc = MakeLightCurve(path_to_log=path_to_log, datasets=datasets, args=args)
+    lc = MakeLightCurve(path_to_log=path_to_log, datasets=all_datasets, args=args)
     #PlotLightCurve(lc, path_to_log=path_to_log, args=args)
 ##############################################
 

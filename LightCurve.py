@@ -13,16 +13,23 @@ def MakeLightCurve(path_to_log, datasets, args):
         t_max = max([dataset.gti.time_stop[-1] for dataset in datasets])
         time_bin_size = args.LightCurveBinDuration * u.day
         n_bins = int(((t_max - t_min) / time_bin_size).decompose())
-        #time_edges = t_min + TimeDelta([i * time_bin_size for i in range(n_bins + 1)])
-        time_edges = t_min + TimeDelta(np.arange(n_bins + 1) * time_bin_size)
+        time_intervals = []
+        current_start = t_min
+        while current_start < t_max:
+            current_end = min(current_start + args.LightCurveBinDuration * u.day, t_max)
+            time_intervals.append([current_start, current_end])
+            current_start = current_end
 
-        time_axis = TimeMapAxis.from_time_edges(time_min=time_edges[:-1], time_max=time_edges[1:])
-
+        # #time_edges = t_min + TimeDelta([i * time_bin_size for i in range(n_bins + 1)])
+        # time_edges = t_min + TimeDelta(np.arange(n_bins + 1) * time_bin_size)
+        # print(f"Time edges: {time_edges}")
+        # time_axis = TimeMapAxis.from_time_edges(time_min=time_edges[:-1], time_max=time_edges[1:])
+        # print(f"Time axis: {time_axis}")
         lc_maker = LightCurveEstimator(
             energy_edges=[e_min, 30 * u.TeV], 
             source=args.ObjectName, 
             reoptimize=False,
-            time_intervals=time_axis,
+            time_intervals=time_intervals,
         )
     else:
         lc_maker = LightCurveEstimator(
@@ -42,7 +49,7 @@ def MakeLightCurve(path_to_log, datasets, args):
     lc.sqrt_ts_threshold_ul = 2
     lc.plot(ax=ax, axis_name="time",sed_type='flux')
     ax.set_title(f"Light Curve for {args.ObjectName}")
-    plt.savefig(args.ADir + "LightCurve/LightCurve.pdf", bbox_inches="tight")
+    plt.savefig(args.ADir + "/LightCurve/LightCurve.pdf", bbox_inches="tight")
     f.write("Light Curve saved to " + args.ADir + "/LightCurve/LightCurve.pdf\n")
 
 

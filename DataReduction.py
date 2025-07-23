@@ -5,10 +5,10 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         os.makedirs(WorkingDir, exist_ok=True)
     else:
         WorkingDir = args.ADir
+        os.makedirs(WorkingDir + "/LightCurve", exist_ok=True)
     os.makedirs(WorkingDir + "/Diagnostics", exist_ok=True)
     os.makedirs(WorkingDir + "/Spectrum", exist_ok=True)
-    os.makedirs(WorkingDir + "/LightCurve", exist_ok=True)
-
+    
     dataset_maker = SpectrumDatasetMaker(
     selection=["counts", "exposure", "edisp"]
     )
@@ -153,7 +153,6 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
 def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=None, tmax=None, safe = True):
     info_table = datasets.info_table(cumulative = True)
     with open(path_to_log, "a") as f:
-        f.write("--------------------------------------------------\n")
         if tmin is None and tmax is None:
             f.write("Significance and Excess for all observations")
         else:
