@@ -73,7 +73,7 @@ def get_parser():
     )
     parser.add_argument(
         "-BackgroundMaker",
-        help="Background maker to use. Options are 'ReflectedRegions' or 'RingBackground'.",
+        help="Background maker to use. Options are 'ReflectedRegions' or 'RingBackground'. Default is 'ReflectedRegions'.",
         type=str,
         required=False,
         default="ReflectedRegions",

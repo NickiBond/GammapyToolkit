@@ -37,6 +37,7 @@ def WriteInputParametersToLog(path_to_log):
         f.write("EnergyAxisMax (TeV): " + str(args.EnergyAxisMax) + "\n")
         f.write("EnergyAxisBins: " + str(args.EnergyAxisBins) + "\n")
         f.write("OnRegionRadius: " + str(args.OnRegionRadius) + "\n")
+        f.write("BackgroundMaker: " + str(args.BackgroundMaker) + "\n")
         f.write("VEGASLogFile: " + str(args.VEGASLogFile) + "\n")
         f.write(
             "IntegralFluxMinEnergy (TeV): " + str(args.IntegralFluxMinEnergy) + "\n"
@@ -58,6 +59,8 @@ def WriteInputParametersToLog(path_to_log):
         )
         f.write("LightCurveComparisonULs: " + str(args.LightCurveComparisonULs) + "\n")
         f.write("SpectralVariabilityTimeBinFile: " + str(args.SpectralVariabilityTimeBinFile) + "\n")
+        f.write("Debug: " + str(args.Debug) + "\n")
+
         f.write("--------------------------------------------------\n")
 
 
