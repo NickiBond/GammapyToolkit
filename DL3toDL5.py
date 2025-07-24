@@ -30,7 +30,7 @@ import sys
 
 sys.path.append("/Users/nickibond/Documents/Research/Toolkit")
 from importer import *
-from AddArguments import get_parser
+from AddArguments import get_parser, CheckAllowedSpectralModelInputted
 from WriteLogFile import WritePackageVersionsToLog, WriteInputParametersToLog, WriteIntegralFluxToLog
 from SelectRuns import SelectRuns
 from Diagnostics import (
@@ -49,6 +49,7 @@ from Spectrum import SpectrumTimeBins
 
 
 args = get_parser().parse_args()
+CheckAllowedSpectralModelInputted(args)
 cmd_line_args = ' '.join(sys.argv)
 ########################################
 

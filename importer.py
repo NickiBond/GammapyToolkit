@@ -3,10 +3,12 @@
 # Standard Library
 import os
 import argparse
+import re
 import warnings
 from datetime import datetime
 import io
 from contextlib import redirect_stdout
+import operator
 
 
 # Scientific / Numeric Libraries
@@ -48,7 +50,7 @@ from gammapy.makers import (
     SafeMaskMaker,
 )
 from gammapy.modeling import Fit
-from gammapy.modeling.models import PowerLawSpectralModel, SkyModel, Models, LogParabolaSpectralModel, BrokenPowerLawSpectralModel, SmoothBrokenPowerLawSpectralModel, ConstantTemporalModel
+from gammapy.modeling.models import PowerLawSpectralModel, SkyModel, Models, LogParabolaSpectralModel, BrokenPowerLawSpectralModel, SmoothBrokenPowerLawSpectralModel, ConstantTemporalModel, CompoundSpectralModel
 from gammapy.estimators import FluxPointsEstimator, LightCurveEstimator
 from gammapy.visualization import plot_spectrum_datasets_off_regions
 

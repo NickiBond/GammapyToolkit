@@ -69,49 +69,26 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         plt.savefig(WorkingDir + "/Diagnostics/OnOffExclusionRegions.pdf")
     plt.close()
 
-    if args.SpectralModel == "PowerLaw":
-        spectral_model = PowerLawSpectralModel(
-            index=args.PowerLawIndex,
-            amplitude=args.PowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
-            reference=args.PowerLawReferenceEnergy * u.Unit("TeV"),
-        )
-    elif args.SpectralModel == "PowerLawCutOff":
-        spectral_model = PowerLawSpectralModel(
-            index=args.PowerLawCutOffIndex,
-            amplitude=args.PowerLawCutOffAmplitude * u.Unit("cm-2 s-1 TeV-1"),
-            reference=args.PowerLawCutOffReferenceEnergy * u.Unit("TeV"),
-            cutoff=args.PowerLawCutOffEnergy * u.Unit("TeV"),
-        )
-    elif args.SpectralModel == "BrokenPowerLaw":
-        spectral_model = BrokenPowerLawSpectralModel(
-            index=args.BrokenPowerLawIndex,
-            amplitude=args.BrokenPowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
-            reference=args.BrokenPowerLawReferenceEnergy * u.Unit("TeV"),
-            break_energy=args.BrokenPowerLawBreakEnergy * u.Unit("TeV"),
-        )
-    elif args.SpectralModel == "LogParabola":
-        spectral_model = LogParabolaSpectralModel(
-            amplitude=args.LogParabolaAmplitude * u.Unit("cm-2 s-1 TeV-1"),
-            reference=args.LogParabolaReferenceEnergy * u.Unit("TeV"),
-            alpha=args.LogParabolaAlpha,
-            beta=args.LogParabolaBeta,
-        )
-    elif args.SpectralModel == "SmoothBrokenPowerLaw":
-        spectral_model = SmoothBrokenPowerLawSpectralModel(
-            index1=args.SmoothBrokenPowerLawIndex1,
-            index2=args.SmoothBrokenPowerLawIndex2,
-            amplitude=args.SmoothBrokenPowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
-            reference=args.SmoothBrokenPowerLawEnergyReference * u.Unit("TeV"),
-            ebreak= args.SmoothBrokenPowerLawEnergyBreak * u.Unit("TeV"),
-            beta=args.SmoothBrokenPowerLawBeta,
-        )
+    spectral_model = BuildModel(args)
     model = SkyModel(spectral_model=spectral_model, name=str(args.ObjectName))
     with open(path_to_log, "a") as f:
         f.write("Initial Model Parameters \n")
         f.write("Model: " + str(model) + "\n")
         f.write("Spectral Model: " + str(args.SpectralModel) + "\n")
-        f.write("Spectral Model Parameters: " + str(model.spectral_model.parameters) + "\n")
-        f.write("--------------------------------------------------\n")
+        f.write("Spectral Model Parameters: \n")
+        if isinstance(spectral_model, CompoundSpectralModel):
+            f.write(f"  Compound Model: {spectral_model.__class__.__name__}\n")
+            f.write(f"  Operator: {spectral_model.operator.__name__}\n")
+
+            for i, component in enumerate([spectral_model.model1, spectral_model.model2], start=1):
+                f.write(f"  Component {i} ({component.__class__.__name__}):\n")
+                for par in component.parameters:
+                    f.write(f"    {par.name} = {par.value} {par.unit}\n")
+        else:
+            f.write(f"  Model: {spectral_model.__class__.__name__}\n")
+            for par in spectral_model.parameters:
+                f.write(f"    {par.name} = {par.value} {par.unit}\n")
+                f.write("--------------------------------------------------\n")
     datasets.models = [model]
     fit_joint = Fit()
     fit_result = fit_joint.run(datasets=datasets)
@@ -135,15 +112,16 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
                 f.write(f"Saved Spectrum Fit for Obs ID {dataset.name} to {predicted_counts_dir}/SpectrumFit_{dataset.name}.pdf\n")
             plt.close()
     # Next calculate flux points by fitting the fit_result model's amplitude in each energy bin
-    flux_points  = FluxPointsEstimator(
+    fpe  = FluxPointsEstimator(
         energy_edges = energy_axis.edges,
         source = str(args.ObjectName),
         selection_optional = "all",
-        # The lines below are due to a bug in gammapy to do with how it fits non-detection points. This is a workaround for now. 
-        # norm_min=-1e2,
-        # norm_max=1e2,
-        # norm_values=np.array(np.linspace(-10,10,10))
-        ).run(datasets=datasets)
+        )
+    # The lines below are due to a bug in gammapy to do with how it fits non-detection points. This is a workaround for now. 
+    fpe.norm_min=-1e2,
+    fpe.norm_max=1e2,
+    fpe.norm.scan_values=np.array(np.linspace(-10,10,10))
+    flux_points=fpe.run(datasets=datasets)
     flux_points.to_table().write(
             os.path.join(WorkingDir, "Spectrum/SED.ecsv"), overwrite=True
         )
@@ -155,6 +133,66 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
     flux_points_dataset.plot_fit()
     plt.savefig(os.path.join(WorkingDir, "Spectrum/SED_FluxPoints.pdf"))
     return fit_result, datasets
+
+def BuildModel(args):
+    models = {}
+    if "PowerLaw" in args.SpectralModel:
+        models["PowerLaw"] = PowerLawSpectralModel(
+            index=args.PowerLawIndex,
+            amplitude=args.PowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
+            reference=args.PowerLawReferenceEnergy * u.Unit("TeV"),
+        )
+    if "PowerLawCutOff" in args.SpectralModel:
+        models["PowerLawCutOff"] = PowerLawSpectralModel(
+            index=args.PowerLawCutOffIndex,
+            amplitude=args.PowerLawCutOffAmplitude * u.Unit("cm-2 s-1 TeV-1"),
+            reference=args.PowerLawCutOffReferenceEnergy * u.Unit("TeV"),
+            cutoff=args.PowerLawCutOffEnergy * u.Unit("TeV"),
+        )
+    if "BrokenPowerLaw" in args.SpectralModel:
+        models["BrokenPowerLaw"] = BrokenPowerLawSpectralModel(
+            index=args.BrokenPowerLawIndex,
+            amplitude=args.BrokenPowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
+            reference=args.BrokenPowerLawReferenceEnergy * u.Unit("TeV"),
+            break_energy=args.BrokenPowerLawBreakEnergy * u.Unit("TeV"),
+        )
+    if "LogParabola" in args.SpectralModel:
+        models["LogParabola"] = LogParabolaSpectralModel(
+            amplitude=args.LogParabolaAmplitude * u.Unit("cm-2 s-1 TeV-1"),
+            reference=args.LogParabolaReferenceEnergy * u.Unit("TeV"),
+            alpha=args.LogParabolaAlpha,
+            beta=args.LogParabolaBeta,
+        )
+    if "SmoothBrokenPowerLaw" in args.SpectralModel:
+        models["SmoothBrokenPowerLaw"] = SmoothBrokenPowerLawSpectralModel(
+            index1=args.SmoothBrokenPowerLawIndex1,
+            index2=args.SmoothBrokenPowerLawIndex2,
+            amplitude=args.SmoothBrokenPowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
+            reference=args.SmoothBrokenPowerLawReferenceEnergy * u.Unit("TeV"),
+            ebreak= args.SmoothBrokenPowerLawEnergyBreak * u.Unit("TeV"),
+            beta=args.SmoothBrokenPowerLawBeta,
+        )
+    parts = re.split(r'([*+])', args.SpectralModel)
+    if len(parts) == 1:
+        return models[parts[0]]
+    elif len(parts) == 3:
+        model1, add_or_multiply, model2 = parts
+        if add_or_multiply == "*":
+            return CompoundSpectralModel(
+                models[model1],
+                models[model2],
+                operator.mul
+            )
+        elif add_or_multiply == "+":
+            return CompoundSpectralModel(
+                models[model1],
+                models[model2],
+                operator.add
+            )
+        if operator not in ["*", "+"]:
+            raise ValueError(f"Unsupported operator: {operator}")
+    else:
+        raise ValueError("Only binary compound models are supported.")
 
 def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=None, tmax=None, safe = True):
     info_table = datasets.info_table(cumulative = True)
