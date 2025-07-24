@@ -25,44 +25,9 @@ def WritePackageVersionsToLog(path_to_log):
 def WriteInputParametersToLog(path_to_log):
     with open(path_to_log, "a") as f:
         f.write("Input Parameters:\n")
-        f.write("ObjectName: " + args.ObjectName + "\n")
-        f.write("IncludeNearby: " + str(args.IncludeNearby) + "\n")
-        f.write("DL3Path: " + args.DL3Path + "\n")
-        f.write("ADir: " + args.ADir + "\n")
-        f.write("RunList: " + str(args.RunList) + "\n")
-        f.write("RunExcludeList: " + str(args.RunExcludeList) + "\n")
-        f.write("FromDate: " + args.FromDate + "\n")
-        f.write("ToDate: " + args.ToDate + "\n")
-        f.write("EnergyAxisMin (TeV): " + str(args.EnergyAxisMin) + "\n")
-        f.write("EnergyAxisMax (TeV): " + str(args.EnergyAxisMax) + "\n")
-        f.write("EnergyAxisBins: " + str(args.EnergyAxisBins) + "\n")
-        f.write("OnRegionRadius: " + str(args.OnRegionRadius) + "\n")
-        f.write("BackgroundMaker: " + str(args.BackgroundMaker) + "\n")
-        f.write("VEGASLogFile: " + str(args.VEGASLogFile) + "\n")
-        f.write(
-            "IntegralFluxMinEnergy (TeV): " + str(args.IntegralFluxMinEnergy) + "\n"
-        )
-        f.write("LightCurve: " + str(args.LightCurve) + "\n")
-        f.write(
-            "LightCurveBinDuration (days): " + str(args.LightCurveBinDuration) + "\n"
-        )
-        f.write("LightCurveMinEnergy (TeV): " + str(args.LightCurveMinEnergy) + "\n")
-        f.write("LightCurveNSigma: " + str(args.LightCurveNSigma) + "\n")
-        f.write("LightCurveNSigmaUL: " + str(args.LightCurveNSigmaUL) + "\n")
-        f.write(
-            "LightCurveSelectionOptional: "
-            + str(args.LightCurveSelectionOptional)
-            + "\n"
-        )
-        f.write(
-            "LightCurveComparisonPoints: " + str(args.LightCurveComparisonPoints) + "\n"
-        )
-        f.write("LightCurveComparisonULs: " + str(args.LightCurveComparisonULs) + "\n")
-        f.write("SpectralVariabilityTimeBinFile: " + str(args.SpectralVariabilityTimeBinFile) + "\n")
-        f.write("Debug: " + str(args.Debug) + "\n")
-
+        for arg_name, arg_value in vars(args).items():
+            f.write(f"{arg_name}: {arg_value}\n")
         f.write("--------------------------------------------------\n")
-
 
 def WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin= None, tmax=None):
     if tmin != None and tmax != None:
