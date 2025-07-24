@@ -115,26 +115,26 @@ fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis
 
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
-if args.SpectralVariabilityTimeBinFile is not None:   
-    f.write("--------------------------------------------------\n")
-    time_bins = SpectrumTimeBins(args)
-    for i, (tmin, tmax) in enumerate(time_bins):
-        with open(path_to_log, "a") as f:
+if args.SpectralVariabilityTimeBinFile is not None:
+    with open(path_to_log, "a") as f:
+        f.write("--------------------------------------------------\n")
+        time_bins = SpectrumTimeBins(args)
+        for i, (tmin, tmax) in enumerate(time_bins):
             f.write(f"Running Data Reduction Chain for observations from {tmin} to {tmax}\n")
-        label = f"timebin_{i}"
-        selected_obs = [ 
-            obs
-            for obs in observations
-            if obs.tstart.mjd >= tmin and obs.tstart.mjd <= tmax
-            # if an observation crosses the time bin edge we include it in first time bin (i.e. we look at tstart not tstop)
-        ]
-        selected_obs_ids = [obs.obs_id for obs in selected_obs]
-        if len(selected_obs) == 0:
-            with open(path_to_log, "a") as f:
-                f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
-            continue
-        fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, tmin=tmin, tmax=tmax)[0]
-        fit_results.append(fit_result)
+            label = f"timebin_{i}"
+            selected_obs = [ 
+                obs
+                for obs in observations
+                if obs.tstart.mjd >= tmin and obs.tstart.mjd <= tmax
+                # if an observation crosses the time bin edge we include it in first time bin (i.e. we look at tstart not tstop)
+            ]
+            selected_obs_ids = [obs.obs_id for obs in selected_obs]
+            if len(selected_obs) == 0:
+                with open(path_to_log, "a") as f:
+                    f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
+                continue
+            fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, tmin=tmin, tmax=tmax)[0]
+            fit_results.append(fit_result)
     ######### Look for Spectral Variability ##########
     MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
     # flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
@@ -146,7 +146,7 @@ if args.SpectralVariabilityTimeBinFile is not None:
 # Find what % Crab the source is
 # Write these to log file
 # Note that this is handled for both the case where there are multiple time bins and where there is only one time bin
-WriteIntegralFluxToLog(fit_result, args, path_to_log)
+WriteIntegralFluxToLog(fit_results_full_dataset, args, path_to_log)
 if fit_results != []:
     for fit_result, (tmin,tmax) in zip(fit_results, time_bins):
         WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin=tmin, tmax=tmax)

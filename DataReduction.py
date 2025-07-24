@@ -106,6 +106,12 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
             beta=args.SmoothBrokenPowerLawBeta,
         )
     model = SkyModel(spectral_model=spectral_model, name=str(args.ObjectName))
+    with open(path_to_log, "a") as f:
+        f.write("Initial Model Parameters \n")
+        f.write("Model: " + str(model) + "\n")
+        f.write("Spectral Model: " + str(args.SpectralModel) + "\n")
+        f.write("Spectral Model Parameters: " + str(model.spectral_model.parameters) + "\n")
+        f.write("--------------------------------------------------\n")
     datasets.models = [model]
     fit_joint = Fit()
     fit_result = fit_joint.run(datasets=datasets)

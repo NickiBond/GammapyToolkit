@@ -39,9 +39,20 @@ def MakeLightCurve(path_to_log, datasets, args):
     )
     lc_maker.n_sigma_ul = args.LightCurveNSigmaUL
     lc_maker.selection_optional = args.LightCurveSelectionOptional
-   
-
     lc = lc_maker.run(datasets)
+
+    # # Fit Constant Temporal Model
+    # model = datasets.models[args.ObjectName]
+    # model.temporal_model = ConstantTemporalModel()
+    # for par in model.spectral_model.parameters:
+    #     par.frozen = True
+    # model.temporal_model.const.frozen = False
+    # fit = Fit()
+    # result = fit.run(datasets=datasets)
+
+    # f.write(f"Fitted constant flux norm: {model.temporal_model.norm.value:.2e} ± {model.temporal_model.norm.error:.2e} cm-2 s-1\n")
+    # f.write(f"Fit success: {result.success}, Fit stat: {result.total_stat:.2f}\n")    
+
     fig, ax = plt.subplots(
         figsize=(8, 6),
     )
