@@ -106,7 +106,7 @@ def get_parser():
         "-SpectralModel",
         required=False,
         default="PowerLaw",
-        help="Spectral model or expression of 2 models (e.g., PowerLaw, PowerLawCutOff, BrokenPowerLaw, LogParabola, SmoothBrokenPowerLaw, PowerLaw*ExpCutoff, PowerLaw+LogParabola) \n Note: To use a compound model, use * or + as the operator. \n e.g. PowerLaw*ExpCutoff or PowerLaw+LogParabola and quotes around the expression. \n Default is PowerLaw.",
+        help="Spectral model or expression of 2 models (e.g., PowerLaw, PowerLawCutOff, BrokenPowerLaw, LogParabola, SmoothBrokenPowerLaw, PowerLaw+ExpCutoff, PowerLaw+LogParabola) \n e.g. PowerLaw+ExpCutoff or PowerLaw+LogParabola and quotes around the expression. \n Default is PowerLaw.",
     )
 
     # --- PowerLaw group ---

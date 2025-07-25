@@ -172,25 +172,19 @@ def BuildModel(args):
             ebreak= args.SmoothBrokenPowerLawEnergyBreak * u.Unit("TeV"),
             beta=args.SmoothBrokenPowerLawBeta,
         )
-    parts = re.split(r'([*+])', args.SpectralModel)
+    parts = re.split(r'([+])', args.SpectralModel)
     if len(parts) == 1:
         return models[parts[0]]
     elif len(parts) == 3:
-        model1, add_or_multiply, model2 = parts
-        if add_or_multiply == "*":
-            return CompoundSpectralModel(
-                models[model1],
-                models[model2],
-                operator.mul
-            )
-        elif add_or_multiply == "+":
+        model1, operation, model2 = parts
+        if operation == "+":
             return CompoundSpectralModel(
                 models[model1],
                 models[model2],
                 operator.add
             )
-        if operator not in ["*", "+"]:
-            raise ValueError(f"Unsupported operator: {operator}")
+        if operation not in ["+"]:
+            raise ValueError(f"Unsupported operator: {operation}")
     else:
         raise ValueError("Only binary compound models are supported.")
 

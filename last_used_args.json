@@ -1,7 +1,7 @@
 {
   "ObjectName": "M87",
   "DL3Path": "/Users/nickibond/Documents/Research/M87/dl3_test_8Jul",
-  "ADir": "/Users/nickibond/Documents/Research/M87/TestDirectory6",
+  "ADir": "/Users/nickibond/Documents/Research/M87/TestDirectory12",
   "RunList": "",
   "RunExcludeList": "",
   "FromDate": "2007-01-01T00:00:00",
@@ -22,12 +22,14 @@
   "LightCurveComparisonULs": "",
   "LightCurve": false,
   "IncludeNearby": false,
-  "SpectralModel": "PowerLaw",
-  "Index": "",
-  "Amplitude": "",
-  "Reference": "",
-  "Alpha": "",
-  "Beta": "",
-  "E_0": "",
-  "Lambda_": ""
+  "Debug": false,
+  "SpectralModel": "PowerLaw+LogParabola",
+  "BackgroundMaker": "RingBackground",
+  "PowerLawIndex": "2.0",
+  "PowerLawAmplitude": "1e-12",
+  "PowerLawReferenceEnergy": "1.0",
+  "LogParabolaAlpha": "2.0",
+  "LogParabolaBeta": "1.0",
+  "LogParabolaReferenceEnergy": "10.0",
+  "LogParabolaAmplitude": "1e-15"
 }
