@@ -170,4 +170,6 @@ with open(path_to_log, "a") as f:
     f.write("--------------------------------------------------\n")
     f.write(f"Script Runtime: {((time.time() - script_start_time) / 60):.2f} minutes \n")
     f.write("--------------------------------------------------\n")
+print("\nAnalysis complete. Log file written to: " + path_to_log + "\n")
+print(f"Script Runtime: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 #################################################

@@ -128,12 +128,36 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
     
     # Plot the flux points and best fit spectral model
     flux_points_dataset = FluxPointsDataset(
-    data=flux_points, models=datasets.models)
-
-    flux_points_dataset.plot_fit()
-    plt.savefig(os.path.join(WorkingDir, "Spectrum/SED_FluxPoints.pdf"))
+        data=flux_points, 
+        models=datasets.models)
+    plot_success = safe_plot_fit(flux_points_dataset, WorkingDir=WorkingDir)
+    if plot_success:
+        with open(path_to_log, "a") as f:
+            f.write("Plot generated successfully.\n")
+            f.write(f"Saved SED plot to {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf\n")
+    else:
+        with open(path_to_log, "a") as f:
+            f.write(f"Failed to generate plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. Continuing...\n")
     return fit_result, datasets
 
+def safe_plot_fit(flux_points_dataset, WorkingDir):
+        """Safely attempt to plot fit results, continuing on failure."""
+        try:
+            flux_points_dataset.plot_fit()
+            plt.savefig(os.path.join(WorkingDir, "Spectrum/Spectrum_FluxPoints.pdf"))
+            return True
+        except ValueError as e:
+            if "Axis limits cannot be NaN or Inf" in str(e):
+                print(f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - data contains NaN/Inf values")
+            else:
+                print(f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - ValueError: {e}")
+            return False
+        except Exception as e:
+            print(f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - Unexpected error: {e}")
+            return False
+        
+
+    
 def BuildModel(args):
     models = {}
     if "PowerLaw" in args.SpectralModel:
