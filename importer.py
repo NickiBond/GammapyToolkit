@@ -47,6 +47,7 @@ from gammapy.datasets import SpectrumDataset, Datasets, FluxPointsDataset
 from gammapy.makers import (
     SpectrumDatasetMaker,
     ReflectedRegionsBackgroundMaker,
+    RingBackgroundMaker,
     SafeMaskMaker,
 )
 from gammapy.modeling import Fit

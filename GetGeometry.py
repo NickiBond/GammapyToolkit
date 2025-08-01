@@ -49,7 +49,7 @@ def GetExclusionRegions(target_position, args, path_to_log):
 def GetExclusionMask(exclusion_regions, target_position, energy_axis):
     exclusion_mask_geom = WcsGeom.create(
         binsz=0.01,  # in degrees
-        width = (4, 4),
+        width = (6, 6),
         skydir=target_position,
         proj="CAR",
         frame ="icrs",

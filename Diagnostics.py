@@ -27,6 +27,12 @@ def DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args):
             + args.ADir
             + "/Diagnostics/DeadtimeDistribution.pdf\n"
         )
+    with open(args.ADir + "/Diagnostics/DeadtimeStats.txt", "w") as f:
+        f.write("Deadtime Statistics:\n")
+        f.write(f"Run Number, On Time, Livetime, Deadtime\n")
+        for i, row in enumerate(obs_table):
+            f.write(f"{row['OBS_ID']}, {row['ONTIME']}, {row['LIVETIME']}, {1 - row['DEADC']}\n")
+        f.write("--------------------------------------------------\n")
     return
 
 
@@ -81,6 +87,14 @@ def DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args):
             + "\n"
         )
         f.write("--------------------------------------------------\n")
+    with open(args.ADir + "/Diagnostics/PointingOffsetStats.txt", "w") as f:
+        f.write("Pointing Offset Statistics:\n")
+        f.write(f"Run Number, RA_OBJ, DEC_OBJ, RA_PNT, DEC_PNT, Angular Separation\n")
+        for i, row in enumerate(obs_table):
+            f.write(
+                f"{row['OBS_ID']}, {row['RA_OBJ']}, {row['DEC_OBJ']}, {row['RA_PNT']}, {row['DEC_PNT']}, "
+                f"{angular_separation(row['RA_OBJ'], row['DEC_OBJ'], row['RA_PNT'], row['DEC_PNT'])}\n"
+            )
     return
 
 
