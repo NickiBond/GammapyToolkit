@@ -19,7 +19,7 @@ help_dict = {
     "ToDate": "Only accept runs before this date (yyyy-mm-ddThh:mm:ss). Default '2030-01-01T00:00:00'.",
     "OnRegionRadius": "Radius of the on region in degrees. VEGAS Default is 0.07071068 to match point-like IRFs.",
     "Debug": "Enable debug mode.",
-    "BackgroundMaker": "Choose from 'ReflectedRegions' or 'RingBackground'. Default is 'Reflected Regions'.",
+    "BackgroundMaker": "Currently only option is 'ReflectedRegions'. Default is 'Reflected Regions'.",
     "EnergyAxisMin": "Minimum energy for analysis. Default 0.1 TeV.",
     "EnergyAxisMax": "Maximum energy for analysis. Default 100 TeV.",
     "EnergyAxisBins": "Number of energy bins. Default 10.",
@@ -266,7 +266,7 @@ add_entry(f, "Exclude Run List File", "RunExcludeList", "", browse=True, row=5)
 add_entry(f, "From Date", "FromDate", "2007-01-01T00:00:00", row=6)
 add_entry(f, "To Date", "ToDate", "2030-01-01T00:00:00", row=7)
 add_entry(f, "On Region Radius (deg)", "OnRegionRadius", "0.07071068", row=8)
-background_maker_options = ["ReflectedRegions", "RingBackground"]
+background_maker_options = ["ReflectedRegions"]
 background_maker_var = tk.StringVar(value="ReflectedRegions")  # Default
 tk.Label(f, text="Background Maker").grid(row=9, column=0, sticky="e", padx=5, pady=2)
 background_maker_menu = tk.OptionMenu(f, background_maker_var, *background_maker_options)

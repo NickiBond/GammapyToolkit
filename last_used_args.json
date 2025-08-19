@@ -1,7 +1,7 @@
 {
-  "ObjectName": "CGCG 420-015",
-  "DL3Path": "/Users/nickibond/Documents/Research/NeutrinoSeyferts/CGCG420/dl3",
-  "ADir": "/Users/nickibond/Documents/Research/NeutrinoSeyferts/CGCG420/analysis_look_at_offsets",
+  "ObjectName": "NGC 4151",
+  "DL3Path": "/Users/nickibond/Documents/Research/NeutrinoSeyferts/ngc4151/dl3",
+  "ADir": "/Users/nickibond/Documents/Research/NeutrinoSeyferts/InvestigatingLivetimeIssue/analysis",
   "RunList": "",
   "RunExcludeList": "",
   "FromDate": "2007-01-01T00:00:00",

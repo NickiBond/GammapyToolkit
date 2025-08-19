@@ -15,10 +15,8 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
     dataset_empty = SpectrumDataset.create(geom=geom, energy_axis_true=energy_axis_true)
     if args.BackgroundMaker == "ReflectedRegions":
         bkg_maker = ReflectedRegionsBackgroundMaker(exclusion_mask=exclusion_mask)
-    elif args.BackgroundMaker == "RingBackground":
-        bkg_maker = RingBackgroundMaker(r_in=0.2 * u.deg, width=0.2 * u.deg, exclusion_mask=exclusion_mask)
     else:
-        raise ValueError(f"Unknown Background Maker: {args.BackgroundMaker}. Choose 'ReflectedRegions' or 'RingBackground'.")
+        raise ValueError(f"Unknown Background Maker: {args.BackgroundMaker}. Choose 'ReflectedRegions'.")
     safe_mask_maker = SafeMaskMaker(methods=["offset-max", "aeff-max", "edisp-bias"], offset_max=1.75 * u.deg, aeff_percent=5, bias_percent=5)
     """
     datasets_not_safe = Datasets()
