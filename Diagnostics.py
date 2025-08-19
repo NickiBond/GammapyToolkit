@@ -134,3 +134,29 @@ def DiagnosticsPeekAtEvents(path_to_log, observations, args):
                 plt.close(fig)
                 i += 1
     return
+
+def check_livetimes(obs_table, all_datasets, observations, path_to_log):
+    obs_table_livetime_sum=0
+    info_table_livetime_sum=0
+    with open(path_to_log, "a") as f:
+        f.write("--------------------------------------------------\n")
+        f.write("Diagnostics: Check Livetime matches in obs_table and info_table\n")
+    for i in range(len(observations)):
+        obs_table_livetime = obs_table['LIVETIME'][i]
+        obs_table_livetime_sum += obs_table_livetime
+        info_table_livetime= all_datasets.info_table(cumulative = False)['livetime'][i]
+        info_table_livetime_sum += info_table_livetime
+        if obs_table_livetime/info_table_livetime < 0.99 or obs_table_livetime/info_table_livetime > 1.01:
+            print(f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}")
+            print(f"WARNING! obs_table livetime / info_table livetime: {obs_table_livetime/info_table_livetime:.2f}")
+            with open(path_to_log, "a") as f:
+                f.write(f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}\n")
+                f.write(f"WARNING! obs_table livetime / info_table livetime: {obs_table_livetime/info_table_livetime:.2f}\n")
+    with open(path_to_log, "a") as f:
+        f.write("--------------------------------------------------\n")
+        f.write(f"Total Livetime from obs_table: {obs_table_livetime_sum}\n")
+        f.write(f"Total Livetime from info_table: {info_table_livetime_sum}\n")
+        f.write(f"Difference: {abs(obs_table_livetime_sum - info_table_livetime_sum)}\n")
+        if abs(obs_table_livetime_sum - info_table_livetime_sum) > 1:
+            f.write("WARNING! Total livetime from obs_table and info_table do not match!\n")
+            

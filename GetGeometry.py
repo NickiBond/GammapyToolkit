@@ -1,6 +1,7 @@
 from importer import *
 
 def GetOnRegion(target_position, args, energy_axis, path_to_log):
+    
     on_region = CircleSkyRegion(center=target_position, radius=args.OnRegionRadius * u.deg)
     with open(path_to_log, "a") as f:
         f.write("On Region: " + str(on_region) + "\n")

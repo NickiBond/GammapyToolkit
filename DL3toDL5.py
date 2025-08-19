@@ -39,6 +39,7 @@ from Diagnostics import (
     DiagnosticsPointingOffsetDistribution,
     DiagnosticsPeekAtIRFs,
     DiagnosticsPeekAtEvents,
+    check_livetimes,
 )
 from EnergyAxes import EnergyAxes
 from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask
@@ -115,20 +116,8 @@ fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis
 #########################################################
 
 ####### Check Livetimes between obs_table and info_table
-def check_livetimes(obs_table, all_datasets, observations):
-    obs_table_livetime_sum=0
-    info_table_livetime_sum=0
-    for i in range(len(observations)):
-        obs_table_livetime = obs_table['LIVETIME'][i]
-        obs_table_livetime_sum += obs_table_livetime
-        info_table_livetime= all_datasets.info_table(cumulative = False)['livetime'][i]
-        info_table_livetime_sum += info_table_livetime
-        if obs_table_livetime/info_table_livetime < 0.99 or obs_table_livetime/info_table_livetime > 1.01:
-            print(f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}")
-            print(f"obstable livetime / infotable livetime: {obs_table_livetime/info_table_livetime}")
-    
-check_livetimes(obs_table, all_datasets, observations)
-
+check_livetimes(obs_table, all_datasets, observations, path_to_log)
+########################################################
 
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
