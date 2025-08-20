@@ -1,10 +1,44 @@
 from importer import *
 
-def GetOnRegion(target_position, args, energy_axis, path_to_log):
-    
-    on_region = CircleSkyRegion(center=target_position, radius=args.OnRegionRadius * u.deg)
+from astropy.io import fits
+import astropy.units as u
+from regions import CircleSkyRegion
+from gammapy.maps import RegionGeom
+
+def GetOnRegionRadius(args, path_to_log):
+    radius = None
+    # Try reading RAD_MAX from IRF in header of first fits file (alphabetically)
+    try:
+        files = sorted(os.listdir(args.DL3Path))
+        fits_files = [f for f in files if f.lower().endswith(".fits")]
+        if not fits_files:
+            raise FileNotFoundError("No FITS files found in the given path.")
+        first_file = os.path.join(args.DL3Path, fits_files[0])
+        with fits.open(first_file) as hdul:
+            if "EFFECTIVE AREA" in hdul and "RAD_MAX" in hdul["EFFECTIVE AREA"].header:
+                radius = hdul["EFFECTIVE AREA"].header["RAD_MAX"] * u.deg
+                with open(path_to_log, "a") as f:
+                    f.write(f"Using IRF-defined RAD_MAX = {radius.value} deg for On Region\n")
+    except Exception as irf_error:
+        print(f"[WARNING] Could not read RAD_MAX from IRF: {irf_error}")
+        with open(path_to_log, "a") as f:
+            f.write(f"WARNING: Could not read RAD_MAX from IRF: {irf_error}\n")
+
+    if args.OnRegionRadius is not None:
+        radius = args.OnRegionRadius * u.deg
+        print(f"Using user-defined OnRegionRadius = {radius.value} deg")
+
+    if radius is None:
+        print("[ERROR] No valid radius found (neither IRF nor user-defined). Exiting.")
+        sys.exit(1)
+    return radius
+
+def GetOnRegion(target_position, args, energy_axis, path_to_log, on_region_radius):
+    # Build region
+    on_region = CircleSkyRegion(center=target_position, radius=on_region_radius)
+    # Log
     with open(path_to_log, "a") as f:
-        f.write("On Region: " + str(on_region) + "\n")
+        f.write(f"On Region: {on_region}\n")
     geom = RegionGeom.create(region=on_region, axes=[energy_axis])
     return on_region, geom
 

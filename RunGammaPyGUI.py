@@ -17,7 +17,7 @@ help_dict = {
     "RunExcludeList": "Optional text file listing runs to exclude. If not provided all runs will be included.",
     "FromDate": "Only accept runs after this date (yyyy-mm-ddThh:mm:ss). Default '2007-01-01T00:00:00'.",
     "ToDate": "Only accept runs before this date (yyyy-mm-ddThh:mm:ss). Default '2030-01-01T00:00:00'.",
-    "OnRegionRadius": "Radius of the on region in degrees. VEGAS Default is 0.07071068 to match point-like IRFs.",
+    "OnRegionRadius": "Radius of the on region in degrees, default = None, in which case the radius from the IRF will be used (point-like)",
     "Debug": "Enable debug mode.",
     "BackgroundMaker": "Currently only option is 'ReflectedRegions'. Default is 'Reflected Regions'.",
     "EnergyAxisMin": "Minimum energy for analysis. Default 0.1 TeV.",

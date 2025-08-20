@@ -1,5 +1,6 @@
 from importer import *
-def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args, tmin=None, tmax=None):
+from GetGeometry import GetOnRegionRadius
+def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args, on_region_radius, tmin=None, tmax=None):
     if tmin is not None and tmax is not None:
         WorkingDir = os.path.join(args.ADir, f"SpectralVariability/TimeBin_{tmin}_{tmax}")
         os.makedirs(WorkingDir, exist_ok=True)
@@ -38,7 +39,6 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         dataset = dataset_maker.run(dataset_empty.copy(name=str(obs_id)), observation)
         dataset_on_off = bkg_maker.run(dataset, observation)
         datasets.append(dataset_on_off)
-        plt.figure()
     # Significance Calculation
     CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=False)
     datasets = Datasets()
@@ -47,15 +47,15 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         dataset_on_off = bkg_maker.run(dataset, observation)
         dataset_on_off = safe_mask_maker.run(dataset_on_off, observation)
         datasets.append(dataset_on_off)
-        plt.figure()
 
     # Significance Calculation
     CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=True)
 
-
+    plt.figure()
     # Plot on and off regions
     ax = exclusion_mask.plot()
-    on_region = CircleSkyRegion(center=SkyCoord.from_name(args.ObjectName).icrs, radius=args.OnRegionRadius * u.deg)
+    on_region_radius=GetOnRegionRadius(args, path_to_log)
+    on_region = CircleSkyRegion(center=SkyCoord.from_name(args.ObjectName).icrs, radius=on_region_radius)
     on_region.to_pixel(ax.wcs).plot(ax=ax, color="lime")
     plot_spectrum_datasets_off_regions(ax=ax, datasets=datasets)
     plt.legend(["ON region"])

@@ -6,7 +6,7 @@
   "RunExcludeList": "",
   "FromDate": "2007-01-01T00:00:00",
   "ToDate": "2030-01-01T00:00:00",
-  "OnRegionRadius": "0.1",
+  "OnRegionRadius": "",
   "EnergyAxisMin": "0.1",
   "EnergyAxisMax": "30",
   "EnergyAxisBins": "10",

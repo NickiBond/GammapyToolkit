@@ -42,7 +42,7 @@ from Diagnostics import (
     check_livetimes,
 )
 from EnergyAxes import EnergyAxes
-from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask
+from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask, GetOnRegionRadius
 from DataReduction import RunDataReductionChain
 from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
 from LightCurve import MakeLightCurve, PlotLightCurve
@@ -104,7 +104,8 @@ energy_axis, energy_axis_true = EnergyAxes(args, path_to_log)
 ########## Define Geometry #############
 # Define the on region
 # Define exclusion regions
-on_region, geom = GetOnRegion(target_position, args, energy_axis, path_to_log)
+on_region_radius = GetOnRegionRadius(args, path_to_log)
+on_region, geom = GetOnRegion(target_position, args, energy_axis, path_to_log, on_region_radius)
 exclusion_regions = GetExclusionRegions(target_position, args, path_to_log)
 exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axis)
 ##############################################
@@ -112,7 +113,7 @@ exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axi
 
 ########### Data Reduction Chain: Significance and Spectrum ############
 # Note this is done with whole dataset (i.e. before we remove areas with higher systematics)
-fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args)
+fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args, on_region_radius)
 #########################################################
 
 ####### Check Livetimes between obs_table and info_table
@@ -139,7 +140,7 @@ if args.SpectralVariabilityTimeBinFile is not None:
                 with open(path_to_log, "a") as f:
                     f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
                 continue
-            fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, tmin=tmin, tmax=tmax)[0]
+            fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, on_region_radius,tmin=tmin, tmax=tmax)[0]
             fit_results.append(fit_result)
     ######### Look for Spectral Variability ##########
     MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)

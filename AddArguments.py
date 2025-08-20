@@ -67,10 +67,10 @@ def get_parser():
     )
     parser.add_argument(
         "-OnRegionRadius",
-        help="Radius of the on region in degrees, default =0.07071068 to match VEGAS IRFs",
+        help="Radius of the on region in degrees, default = None, in which case the radius from the IRF will be used (point-like)",
         type=float,
         required=False,
-        default=0.07071068,
+        default=None
     )
     parser.add_argument(
         "-BackgroundMaker",
