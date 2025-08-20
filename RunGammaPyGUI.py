@@ -105,6 +105,70 @@ def browse_file(entry):
     if path:
         entry.delete(0, tk.END)
         entry.insert(0, path)
+def load_json_config():
+    """Load JSON configuration and populate form fields"""
+    path = filedialog.askopenfilename(
+        filetypes=[("JSON Files", "*.json")],
+        title="Select JSON Configuration"
+    )
+    if not path:
+        return
+    
+    try:
+        with open(path, "r") as f:
+            config = json.load(f)
+        
+        # Populate the form with loaded configuration
+        populate_form_from_config(config)
+        
+        tk.messagebox.showinfo("Success", f"Configuration loaded from {os.path.basename(path)}")
+        
+    except json.JSONDecodeError:
+        tk.messagebox.showerror("Error", "Invalid JSON file")
+    except Exception as e:
+        tk.messagebox.showerror("Error", f"Failed to load JSON: {str(e)}")
+
+def populate_form_from_config(config):
+    """Populate all form fields from a configuration dictionary"""
+    # Clear existing form first
+    reset_form()
+    
+    # Populate text entries
+    for key, val in config.items():
+        if key in entries:
+            entries[key].delete(0, tk.END)
+            entries[key].insert(0, str(val))
+        elif key == "LightCurve":
+            lightcurve_var.set(val in [True, "True", "true", 1, "1"])
+        elif key == "IncludeNearby":
+            include_nearby_var.set(val in [True, "True", "true", 1, "1"])
+        elif key == "Debug":
+            debug_mode_var.set(val in [True, "True", "true", 1, "1"])
+        elif key == "SpectralModel":
+            spectral_model_var.set(str(val))
+        elif key == "BackgroundMaker":
+            if str(val) in ["ReflectedRegions"]:  # Add more options as needed
+                background_maker_var.set(str(val))
+    
+    # Update spectral fields with the loaded configuration
+    update_spectral_fields(saved_args=config)
+    
+    # Populate any spectral parameters that were loaded
+    for key, val in config.items():
+        if key in spectral_entries:
+            _, entry = spectral_entries[key]
+            entry.delete(0, tk.END)
+            entry.insert(0, str(val))
+
+def save_json_config():
+    """Save current configuration to a JSON file"""
+    path = filedialog.asksaveasfilename(
+        defaultextension=".json",
+        filetypes=[("JSON Files", "*.json")],
+        title="Save Configuration As"
+    )
+    if not path:
+        return
 
 # --- Script execution ---
 def run_script():
@@ -162,6 +226,10 @@ def run_script():
             with open("last_used_args.json", "w") as f:
                 json.dump(saved_data, f, indent=2)
 
+            # Save JSON to analysis folder so it can be reused if needed later (if something else has been run and overwritten last_used_args.json)
+            with open(os.path.join(entries["ADir"].get(), "args.json"), "w") as f:
+                json.dump(saved_data, f, indent=2)
+
             subprocess.run(args, cwd="/Users/nickibond/Documents")
             status_var.set("Finished!")
         except Exception as e:
@@ -199,15 +267,6 @@ def reset_form():
 root = tk.Tk()
 root.title("DL3 to DL5 GUI")
 entries = {}
-
-# Load and resize logo image
-try:
-    image = Image.open("/Users/nickibond/Documents/Research/Toolkit/ChatGPTGammaPyScriptLogo.png")
-    resized_image = image.resize((400,400), Image.LANCZOS)
-    logo = ImageTk.PhotoImage(resized_image)
-except Exception as e:
-    logo = None
-    print(f"Warning: Could not load logo image: {e}")
 
 main_container = tk.Frame(root)
 main_container.pack(fill="both", expand=True)
@@ -433,6 +492,8 @@ model_entry.bind("<Return>", lambda event: update_spectral_fields(saved_args))
 tk.Button(buttons_frame, text="Run Script", command=run_script).pack(side="left", padx=10)
 tk.Button(buttons_frame, text="Help", command=show_help).pack(side="left", padx=10)
 tk.Button(buttons_frame, text="Reset", command=reset_form).pack(side="left", padx=10)
+tk.Button(buttons_frame, text="Load Config", command=load_json_config).pack(side="left", padx=10)
+tk.Button(buttons_frame, text="Save Config", command=save_json_config).pack(side="left", padx=10)
 status_var = tk.StringVar(value="Ready...")
 status_label = tk.Label(root, textvariable=status_var, fg="cyan", font=("Helvetica", 16, "bold"))
 status_label.pack(pady=5)
@@ -463,4 +524,13 @@ else:
     saved_args = {}
     # Initialize spectral fields on startup
     update_spectral_fields(saved_args=saved_args)
+
+menu_bar = tk.Menu(root)
+file_menu = tk.Menu(menu_bar, tearoff=0)
+file_menu.add_command(label="Load Configuration", command=load_json_config)
+file_menu.add_command(label="Save Configuration", command=save_json_config)
+file_menu.add_separator()
+menu_bar.add_cascade(label="File", menu=file_menu)
+root.config(menu=menu_bar)
+
 root.mainloop()
