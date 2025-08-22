@@ -1,7 +1,7 @@
 {
-  "ObjectName": "M87",
-  "DL3Path": "/Users/nickibond/Documents/Research/M87/dl3_21Aug",
-  "ADir": "/Users/nickibond/Documents/Research/M87/Analysis_21Aug_LivetimeFix",
+  "ObjectName": "NGC4151",
+  "DL3Path": "/Users/nickibond/Documents/Research/NeutrinoSeyferts/ngc4151/dl3_after_livetime_fix",
+  "ADir": "/Users/nickibond/Documents/Research/ngc4151/analysis_after_livetime_fix",
   "RunList": "",
   "RunExcludeList": "",
   "FromDate": "2007-01-01T00:00:00",

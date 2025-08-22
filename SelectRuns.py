@@ -69,7 +69,8 @@ def SelectRuns(path_to_log, args):
             + "\n"
         )
     
-
+    if len(obs_table) == 0:
+        raise ValueError("No observations selected. Please check your selection criteria.")
 
     #  Only accept runs after a certain date
     if args.FromDate != None:
@@ -83,7 +84,9 @@ def SelectRuns(path_to_log, args):
             + str(len(obs_table))
             + "\n"
         )
-
+    if len(obs_table) == 0:
+        raise ValueError("No observations selected. Please check your selection criteria.")
+    
     #  Only accept runs before a certain date
     if args.ToDate != None:
         ToDate = Time(args.ToDate).mjd
@@ -105,4 +108,6 @@ def SelectRuns(path_to_log, args):
     f.write("Observations kept: \n" + str(np.array(obs_table["OBS_ID"])) + "\n")
     f.write("--------------------------------------------------\n")
     f.close()
+    if len(obs_table) == 0:
+        raise ValueError("No observations selected. Please check your selection criteria.")
     return obs_table, observations, target_position, obs_ids
