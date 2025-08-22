@@ -40,6 +40,7 @@ from Diagnostics import (
     DiagnosticsPeekAtIRFs,
     DiagnosticsPeekAtEvents,
     check_livetimes,
+    SaveInfoTable
 )
 from EnergyAxes import EnergyAxes
 from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask, GetOnRegionRadius
@@ -118,6 +119,8 @@ fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis
 
 ####### Check Livetimes between obs_table and info_table
 check_livetimes(obs_table, all_datasets, observations, path_to_log)
+###### Check info_table
+SaveInfoTable(all_datasets, args)
 ########################################################
 
 # Run Data Reduction Chain for each time bin if specified

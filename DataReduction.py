@@ -47,7 +47,6 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         dataset_on_off = bkg_maker.run(dataset, observation)
         dataset_on_off = safe_mask_maker.run(dataset_on_off, observation)
         datasets.append(dataset_on_off)
-
     # Significance Calculation
     CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=True)
 
@@ -215,13 +214,14 @@ def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, arg
     with open(path_to_log, "a") as f:
         if tmin is None and tmax is None:
             f.write("Significance and Excess for all observations")
+
         else:
             f.write(f"Significance and Excess for time bin {tmin} to {tmax}\n")
         if safe:
             f.write(" (after safe mask applied)\n")
         else:
             f.write(" (before safe mask applied)\n")
-        f.write(f"Total Livetime: {info_table['livetime'].to('h')[-1]:.2f}\n")
+        f.write(f"Total Livetime: {info_table['livetime'][-1]:.2f}\n")
         f.write(f"ON: {info_table['counts'][-1]}\n")
         f.write(f"OFF: {info_table['counts_off'][-1]}\n")
         f.write(f"Significance: {info_table['sqrt_ts'][-1]:.2f} sigma\n")

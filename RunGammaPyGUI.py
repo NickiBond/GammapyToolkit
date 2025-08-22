@@ -227,6 +227,7 @@ def run_script():
                 json.dump(saved_data, f, indent=2)
 
             # Save JSON to analysis folder so it can be reused if needed later (if something else has been run and overwritten last_used_args.json)
+            os.makedirs(entries["ADir"].get(), exist_ok=True)
             with open(os.path.join(entries["ADir"].get(), "args.json"), "w") as f:
                 json.dump(saved_data, f, indent=2)
 

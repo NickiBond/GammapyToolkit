@@ -3,8 +3,8 @@ from importer import *
 
 def DiagnosticsTotalTimeStats(path_to_log, obs_table, args):
     with open(path_to_log, "a") as f:
-        f.write(f"Total Livetime: {obs_table['LIVETIME'].sum() / 3600:.2f} hrs\n")
-        f.write(f"Total Ontime: {obs_table['ONTIME'].sum() / 3600:.2f} hrs\n")
+        f.write(f"Total Livetime: {obs_table['LIVETIME'].sum()} s \n")
+        f.write(f"Total Ontime: {obs_table['ONTIME'].sum()} s \n")
         f.write(
             f"Livetime/Ontime Ratio: {obs_table['LIVETIME'].sum() / obs_table['ONTIME'].sum():.2f}\n"
         )
@@ -160,3 +160,9 @@ def check_livetimes(obs_table, all_datasets, observations, path_to_log):
         if abs(obs_table_livetime_sum - info_table_livetime_sum) > 1:
             f.write("WARNING! Total livetime from obs_table and info_table do not match!\n")
             
+def SaveInfoTable(datasets, args):
+    info_table = datasets.info_table(cumulative = False)
+    info_table.write(
+        os.path.join(args.ADir, "Diagnostics/InfoTable.ecsv"), overwrite=True
+    )
+    return   

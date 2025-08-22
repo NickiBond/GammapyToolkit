@@ -20,6 +20,20 @@ def SelectRuns(path_to_log, args):
     f.write(f"Target Position: {target_position.to_string('hmsdms')} \n")
     f.write(f"Target Position: {target_position} \n")
     f.write(f"Initial length of obs table: {len(obs_table)} \n")
+    if args.IncludeNearby:
+        selection = dict(
+            type="sky_circle",
+            frame="icrs",
+            lon=f"{target_position.ra.value} deg",
+            lat=f"{target_position.dec.value} deg",
+            radius="5 deg",
+        )
+        obs_table = data_store.obs_table.select_observations(selection)
+        f.write(
+            "Only observations within 5 degrees of the target position kept. Length of obs table after selection: "
+            + str(len(obs_table))
+            + "\n"
+        )
     # Exclude runs that are not in the run list if run list is provided
     if args.RunList == None:
         f.write("No Run List given. All observations kept.\n")
@@ -55,20 +69,7 @@ def SelectRuns(path_to_log, args):
             + "\n"
         )
     
-    if args.IncludeNearby:
-        selection = dict(
-            type="sky_circle",
-            frame="icrs",
-            lon=f"{target_position.ra.value} deg",
-            lat=f"{target_position.dec.value} deg",
-            radius="5 deg",
-        )
-        obs_table = data_store.obs_table.select_observations(selection)
-        f.write(
-            "Only observations within 5 degrees of the target position kept. Length of obs table after selection: "
-            + str(len(obs_table))
-            + "\n"
-        )
+
 
     #  Only accept runs after a certain date
     if args.FromDate != None:
