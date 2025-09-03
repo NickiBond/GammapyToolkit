@@ -6,7 +6,7 @@ def DiagnosticsTotalTimeStats(path_to_log, obs_table, args):
         f.write(f"Total Livetime: {obs_table['LIVETIME'].sum()} s \n")
         f.write(f"Total Ontime: {obs_table['ONTIME'].sum()} s \n")
         f.write(
-            f"Livetime/Ontime Ratio: {obs_table['LIVETIME'].sum() / obs_table['ONTIME'].sum():.2f}\n"
+            f"Livetime/Ontime Ratio: {obs_table['LIVETIME'].sum() / obs_table['ONTIME'].sum():.6f}\n"
         )
         f.write("--------------------------------------------------\n")
 
@@ -165,4 +165,33 @@ def SaveInfoTable(datasets, args):
     info_table.write(
         os.path.join(args.ADir, "Diagnostics/InfoTable.ecsv"), overwrite=True
     )
-    return   
+    return info_table
+
+def PlotOnOffEvents(info_table_not_cumulative, args, path_to_log):
+    on = info_table_not_cumulative["counts"]
+    off = info_table_not_cumulative["counts_off"]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 10))
+    axes[0, 0].hist(on.value, label="On")
+    axes[0, 1].hist(off.value, label="Off")
+    axes[0, 0].set_xlabel("On Events")
+    axes[0, 1].set_xlabel("Off Events")
+    axes[0, 0].set_ylabel("Counts")
+    axes[0, 1].set_ylabel("Counts")
+    axes[0, 0].set_title("On Counts")
+    axes[0, 1].set_title("Off Counts")
+    axes[0, 0].legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(args.ADir, "Diagnostics/OnOffCounts.pdf"))
+    with open(path_to_log, "a") as f:
+        f.write("Saved On/Off Counts figure to Diagnostics/OnOffCounts.pdf\n")
+    plt.close(fig)
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(on.value, off.value, color='purple')
+    plt.xlabel("On Counts")
+    plt.ylabel("Off Counts")
+    plt.title("On/Off Counts Scatter Plot")
+    plt.savefig(os.path.join(args.ADir, "Diagnostics/OnOffCounts_Scatter.pdf"))
+    with open(path_to_log, "a") as f:
+        f.write("Saved On/Off Counts Scatter figure to Diagnostics/OnOffCounts_Scatter.pdf\n")
+    plt.close()
