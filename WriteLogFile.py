@@ -37,8 +37,11 @@ def WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin= None, tmax=None)
         with open(path_to_log, "a") as f:
             f.write("-----------------------------------\n")
             f.write("Integral Flux: \n")
-            flux,flux_err = fit_result.models[args.ObjectName].spectral_model.integral_error(args.IntegralFluxMinEnergy *u.TeV, 5000*u.TeV)
-            f.write(f"Integral Flux > {args.IntegralFluxMinEnergy} TeV: {flux.value:.2} +/- {flux_err.value:.2} {flux.unit} \n")
+            result= fit_result.models[args.ObjectName].spectral_model.integral_error(args.IntegralFluxMinEnergy *u.TeV, 5000*u.TeV)
+            print(result)
+            print(type(result)) 
+            #flux,flux_err = fit_result.models[args.ObjectName].spectral_model.integral_error(args.IntegralFluxMinEnergy *u.TeV, 5000*u.TeV)
+            #f.write(f"Integral Flux > {args.IntegralFluxMinEnergy} TeV: {flux.value:.2} +/- {flux_err.value:.2} {flux.unit} \n")
     # IntegralFluxResult = DefiniteIntegralPowerLaw(
     #     E_l=ufloat(args.IntegralFluxMinEnergy, 0),
     #     E_r=ufloat(10000000, 0),

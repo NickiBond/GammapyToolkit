@@ -146,7 +146,7 @@ if args.SpectralVariabilityTimeBinFile is not None:
                 with open(path_to_log, "a") as f:
                     f.write(f"Skipping {label}: no observations in MJD range {tmin}-{tmax}\n")
                 continue
-            fit_result = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, on_region_radius,tmin=tmin, tmax=tmax)[0]
+            fit_result, dataset = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, selected_obs, selected_obs_ids, path_to_log, args, on_region_radius,tmin=tmin, tmax=tmax)[0]
             fit_results.append(fit_result)
     ######### Look for Spectral Variability ##########
     MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args)
