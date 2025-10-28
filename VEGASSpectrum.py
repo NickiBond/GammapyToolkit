@@ -200,16 +200,16 @@ def vegas_spectrum(
             linestyle="None",
             marker=".",
             capsize=3,
-            color="blue",
+            color=colour,
             label="VEGAS Residuals",
         )
 
-        ax1.plot(energy_vals, VEGAS_PL_val, color="b", label="VEGAS Power Law")
+        ax1.plot(energy_vals, VEGAS_PL_val, color=colour, label="VEGAS Power Law")
         ax1.fill_between(
             x=energy_vals,
             y1=VEGAS_PL_val - VEGAS_PL_err,
             y2=VEGAS_PL_val + VEGAS_PL_err,
-            color="blue",
+            color=colour,
             alpha=0.3,
             label="VEGAS Power Law Error",
         )
