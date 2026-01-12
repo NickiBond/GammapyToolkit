@@ -29,9 +29,9 @@ def DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args):
         )
     with open(args.ADir + "/Diagnostics/DeadtimeStats.txt", "w") as f:
         f.write("Deadtime Statistics:\n")
-        f.write(f"Run Number, On Time, Livetime, Deadtime\n")
+        f.write(f"Run Number, On Time (s), Livetime (s), Deadtime Fraction\n")
         for i, row in enumerate(obs_table):
-            f.write(f"{row['OBS_ID']}, {row['ONTIME']}, {row['LIVETIME']}, {1 - row['DEADC']}\n")
+            f.write(f"{row['OBS_ID']}, {row['ONTIME']:.4f}, {row['LIVETIME']:.4f}, {1 - row['DEADC']:.4f}\n")
         f.write("--------------------------------------------------\n")
     return
 
