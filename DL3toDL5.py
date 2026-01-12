@@ -54,6 +54,8 @@ CheckAllowedSpectralModelInputted(args)
 cmd_line_args = ' '.join(sys.argv)
 ########################################
 
+with open(path_to_log, "w") as f:
+    f.write(f"Imports Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 ############# Initial Steps #############
 # Check if the Analysis Directory exists, if not create it
@@ -76,6 +78,8 @@ WritePackageVersionsToLog(path_to_log)
 WriteInputParametersToLog(path_to_log)
 ########################################
 
+with open(path_to_log, "w") as f:
+    f.write(f"Initial Steps Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 ############# Select Data #############
 # Select data from the DL3Path directory
@@ -84,6 +88,8 @@ WriteInputParametersToLog(path_to_log)
 obs_table, observations, target_position, obs_ids = SelectRuns(path_to_log, args)
 ########################################
 
+with open(path_to_log, "w") as f:
+    f.write(f"Select Data Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 ###### Initial Debugging Plots #######
 DiagnosticsTotalTimeStats(path_to_log, obs_table, args)
@@ -92,6 +98,9 @@ DiagnosticsPointingOffsetDistribution(path_to_log, obs_table, args)
 DiagnosticsPeekAtIRFs(path_to_log, observations, args)
 DiagnosticsPeekAtEvents(path_to_log, observations, args)
 ########################################
+
+with open(path_to_log, "w") as f:
+    f.write(f"Initial Debugging Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 
 ########## Define Energy Axes  ##########
@@ -110,19 +119,26 @@ exclusion_regions = GetExclusionRegions(target_position, args, path_to_log)
 exclusion_mask = GetExclusionMask(exclusion_regions, target_position, energy_axis)
 ##############################################
 
+with open(path_to_log, "w") as f:
+    f.write(f"Energy Axis and Define Geometry Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 ########### Data Reduction Chain: Significance and Spectrum ############
 # Note this is done with whole dataset (i.e. before we remove areas with higher systematics)
 fit_results_full_dataset, all_datasets = RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args, on_region_radius)
 #########################################################
 
+with open(path_to_log, "w") as f:
+    f.write(f"Data Reduction Chain Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
+
 ####### Check Livetimes between obs_table and info_table
 check_livetimes(obs_table, all_datasets, observations, path_to_log)
 ###### Check info_table
 info_table_not_cumulative = SaveInfoTable(all_datasets, args)
 PlotOnOffEvents(info_table_not_cumulative, args, path_to_log)
-
 ########################################################
+
+with open(path_to_log, "w") as f:
+    f.write(f"Check Livetimes between obs_table and info_table Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 # Run Data Reduction Chain for each time bin if specified
 fit_results = []
@@ -151,6 +167,9 @@ if args.SpectralVariabilityTimeBinFile is not None:
     # flux_points_dataset, stacked, info_table, fit_result, datasets =MakeSpectrumFluxPoints(observations = observations, geom=geom, energy_axis=energy_axis, energy_axis_true=energy_axis_true, on_region=on_region, exclusion_mask=exclusion_mask, args = args, path_to_log=path_to_log)
     # PlotSpectrum(flux_points_dataset, args= args, path_to_log=path_to_log)
 
+with open(path_to_log, "w") as f:
+    f.write(f"Data Reduction Chain for Individual Time Bins Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
+
 ######### Integral Flux ############
 # Find integral flux for the source
 # Find integral flux for the Crab
@@ -163,6 +182,9 @@ if fit_results != []:
         WriteIntegralFluxToLog(fit_result, args, path_to_log, tmin=tmin, tmax=tmax)
 ############################################
 
+with open(path_to_log, "w") as f:
+    f.write(f"Find Integral Flux for Individual Time Bins Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
+
 
 ######### Make Light Curve ############
 # Need non-stacked Observations for Light Curve
@@ -173,6 +195,9 @@ if args.LightCurve == True:
     lc = MakeLightCurve(path_to_log=path_to_log, datasets=all_datasets, args=args)
     #PlotLightCurve(lc, path_to_log=path_to_log, args=args)
 ##############################################
+
+with open(path_to_log, "w") as f:
+    f.write(f"Make Light Curve Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 
 ######### Write End of Log File ##########
