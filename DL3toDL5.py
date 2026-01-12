@@ -54,9 +54,6 @@ CheckAllowedSpectralModelInputted(args)
 cmd_line_args = ' '.join(sys.argv)
 ########################################
 
-with open(path_to_log, "w") as f:
-    f.write(f"Imports Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
-
 ############# Initial Steps #############
 # Check if the Analysis Directory exists, if not create it
 # Create a log file
