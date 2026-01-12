@@ -57,6 +57,7 @@ help_dict = {
     "SmoothBrokenPowerLawAmplitude": "Amplitude in cm^-2 s^-1 TeV^-1 for SmoothBrokenPowerLaw.",
     "SmoothBrokenPowerLawReferenceEnergy": "Reference energy for SmoothBrokenPowerLaw.",
     "SmoothBrokenPowerLawBeta": "Beta parameter for SmoothBrokenPowerLaw.",
+    "exclusion_csv": "Path to a CSV file containing user-defined exclusion regions. The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
 }
 
 # --- Tooltip class ---
@@ -337,6 +338,7 @@ label = tk.Label(f, text="Make Debug Plots?")
 label.grid(row=10, column=0, sticky="e", padx=5, pady=2)
 tk.Checkbutton(f, variable=debug_mode_var).grid(row=10, column=1, sticky="w", pady=2)
 CreateToolTip(label, help_dict["Debug"])
+add_entry(f, "User exclusion regions", "exclusion_csv", "", browse=True, row=11)
 # --- Energy Axis tab ---
 f = frames["Energy Axis"]
 add_entry(f, "Energy Axis Min (TeV)", "EnergyAxisMin", "0.1", row=0)
