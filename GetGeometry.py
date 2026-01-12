@@ -4,6 +4,8 @@ from astropy.io import fits
 import astropy.units as u
 from regions import CircleSkyRegion
 from gammapy.maps import RegionGeom
+from astropy.coordinates import SkyCoord
+from astropy.table import Table
 
 def GetOnRegionRadius(args, path_to_log):
     radius = None
@@ -62,6 +64,7 @@ def GetExclusionRegions(target_position, args, path_to_log):
                 f.write(str(row) + "\n")
         f.write("--------------------------------------------------\n")
 
+    # exclusion region at source
     exclusion_regions = []
     exclusion_regions.append(
         CircleSkyRegion(
@@ -69,6 +72,8 @@ def GetExclusionRegions(target_position, args, path_to_log):
             radius=0.3 * u.deg,
         )
     )
+
+    # exclusion regions for bright stars
     for Star in StarTable:
         target_position_star = SkyCoord(Star["RA_ICRS_"], Star["DE_ICRS_"], unit="deg").icrs
         exclusion_regions.append(
@@ -79,6 +84,15 @@ def GetExclusionRegions(target_position, args, path_to_log):
                 radius=0.1 * u.deg,
             )
         )
+
+    # User supplies exclusion regions.
+    if args.exclusion_csv is not None:
+        user_regions = read_exclusion_csv(args.exclusion_csv)
+        exclusion_regions.extend(user_regions)
+
+        with open(path_to_log, "a") as f:
+            f.write(f"Added {len(user_regions)} user-defined exclusion regions\n")
+
     return exclusion_regions
 
 def GetExclusionMask(exclusion_regions, target_position, energy_axis):
@@ -92,3 +106,47 @@ def GetExclusionMask(exclusion_regions, target_position, energy_axis):
     )
     exclusion_mask = ~exclusion_mask_geom.to_image().to_cube([energy_axis.squash()]).region_mask(exclusion_regions)
     return exclusion_mask
+
+
+
+
+def read_exclusion_csv(csv_path):
+    """
+    Read csv of exclusion regions.
+    Return list of CircleSkyRegion objects.
+
+    Expected columns:
+      - ra  (deg, ICRS)
+      - dec (deg, ICRS)
+      - radius (deg by default, or astropy unit string)
+    """
+    table = Table.read(
+        csv_path,
+        format="csv",
+        names=("ra", "dec", "radius"),
+    )
+    regions = []
+
+    for row in table:
+        # get RA and DEC
+        coord = SkyCoord(
+            ra=row["ra"] * u.deg,
+            dec=row["dec"] * u.deg,
+            frame="icrs",
+        )
+
+        # get radius
+        radius_val = row["radius"]
+
+        if isinstance(radius_val, str):
+            # e.g. "5 arcmin"
+            radius = u.Quantity(radius_val)
+        else:
+            # e.g. 0.2 → assume degrees
+            radius = radius_val * u.deg
+
+        regions.append(
+            CircleSkyRegion(center=coord, radius=radius)
+        )
+
+    return regions

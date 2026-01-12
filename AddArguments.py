@@ -245,6 +245,15 @@ def get_parser():
         required=False,
         default=None,
     )
+
+    parser.add_argument(
+        "-exclusion_csv",
+        help="Path to a CSV file containing user-defined exclusion regions." \
+        " The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
+        type=str,
+        required=False,
+        default=None,
+    )
     return parser
 
 def CheckAllowedSpectralModelInputted(args):

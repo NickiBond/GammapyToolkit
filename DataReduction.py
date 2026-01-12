@@ -6,7 +6,8 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         os.makedirs(WorkingDir, exist_ok=True)
     else:
         WorkingDir = args.ADir
-        os.makedirs(WorkingDir + "/LightCurve", exist_ok=True)
+        if args.LightCurve == True:
+            os.makedirs(WorkingDir + "/LightCurve", exist_ok=True)
     os.makedirs(WorkingDir + "/Diagnostics", exist_ok=True)
     os.makedirs(WorkingDir + "/Spectrum", exist_ok=True)
     

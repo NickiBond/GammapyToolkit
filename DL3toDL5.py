@@ -182,7 +182,7 @@ if fit_results != []:
 ############################################
 
 with open(path_to_log, "a") as f:
-    f.write(f"Find Integral Flux for Individual Time Bins Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
+    f.write(f"Find Integral Flux Complete Time stamp: {((time.time() - script_start_time) / 60):.2f} minutes \n")
 
 
 ######### Make Light Curve ############
