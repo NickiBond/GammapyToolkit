@@ -2,23 +2,22 @@
 """
 Author: Nicki Bond
 Date: 2025-Jan
+TLDR: - This script will take the VEGAS DL3 data files and use gammapy to do various science things like spectra and light curves.
+
 Purpose:
-- This script will take the VEGAS DL3 data files and convert them to DL5 data products.
 - It takes a set of DL3 files and makes an energy spectrum using Gammapy.
 - It also can plot the VEGAS spectrum on the same plot if a VEGAS Stage 6 log file is provided.
 - It can also make a light curve. There are options for the user to change the parameters of gammapy's LightCurveEstimator.
 
 Scope:
-- This script only works on point sources.
+- This script has only been tested on point sources.
+- Most of the testing has been done with VEGAS DL3 files. 
 
 To Run:
-- Activate the environment:
-- - source ~/NBvenv/bin/activate
+- Activate an environment with required packages installed. See EnvironmentPackages.txt for details.
 - Run:
-- - python DL3toDL5.py
-- - e.g. python DL3toDL5.py -ObjectName M87 -DL3Path dl3 -ADir TestDirectory  -LightCurveBinDuration 30 -FromDate 2013-01-01T00:00:00 -ToDate 2023-01-01T00:00:00 -LightCurveMinEnergy 0.35 -EnergyAxisMin 0.2 -EnergyAxisMax 53.87787799835198 -EnergyAxisBins 30
-
-
+- - DL3toDL5.py
+- - e.g. DL3toDL5.py -ObjectName Crab -DL3Path dl3 -ADir AnalysisDirectory  -LightCurveBinDuration 30 -FromDate 2001-01-01T00:00:00 -ToDate 2030-01-01T00:00:00 -LightCurveMinEnergy 0.35 -EnergyAxisMin 0.2 -EnergyAxisMax 10 -EnergyAxisBins 10
 """
 
 ########### Import Libraries ###########
@@ -49,7 +48,6 @@ from DataReduction import RunDataReductionChain
 from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
 from LightCurve import MakeLightCurve, PlotLightCurve
 from Spectrum import SpectrumTimeBins
-
 
 args = get_parser().parse_args()
 CheckAllowedSpectralModelInputted(args)
