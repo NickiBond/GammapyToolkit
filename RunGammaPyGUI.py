@@ -33,6 +33,7 @@ help_dict = {
     "LightCurveSelectionOptional": "Optional steps for light curve processing (e.g. 'all', 'ul', 'scan').",
     "LightCurveComparisonPoints": "CSV file with points for light curve comparison.",
     "LightCurveComparisonULs": "CSV file with upper limits for comparison.",
+    "LightCurveStartTime": "Start time for first bin of light curve. Accepts multiple unit options e.g. mjd:59000, jd:2459000.5, unix:1640995200, or ISO (2022-01-01). Only used if -LightCurveBinDuration is also provided",
     "IncludeNearby": "Include observations of sources within 5 deg of ObjectName in the analysis. default= False",
     "SpectralModel": "Spectral model or expression of 2 models (e.g., PowerLaw, PowerLawCutOff, BrokenPowerLaw, LogParabola, SmoothBrokenPowerLaw, PowerLaw+ExpCutoff, PowerLaw+LogParabola) \n e.g. PowerLaw+ExpCutoff or PowerLaw+LogParabola and quotes around the expression. \n Default is PowerLaw.",
     "PowerLawIndex": "Spectral index for PowerLaw.",
@@ -194,7 +195,7 @@ def run_script():
                 return
 
             args = [
-                "/Users/nickibond/NBvenv/bin/python",
+                "/Users/nickibond/gpy_toolkit/bin/python",
                 "/Users/nickibond/Documents/Research/Toolkit/DL3toDL5.py",
             ]
 
@@ -390,10 +391,11 @@ label.grid(row=0, column=0, sticky="e", padx=5, pady=2)
 tk.Checkbutton(f, variable=lightcurve_var).grid(row=0, column=1, sticky="w", pady=2)
 CreateToolTip(label, help_dict["LightCurve"])
 add_entry(f, "LC Bin Duration (days)", "LightCurveBinDuration", "1", row=1)
-add_entry(f, "LC Min Energy (TeV)", "LightCurveMinEnergy", "", row=2)
-add_entry(f, "LC NSigma", "LightCurveNSigma", "1", row=3)
-add_entry(f, "LC NSigma UL", "LightCurveNSigmaUL", "2", row=4)
-add_entry(f, "LC Selection Optional", "LightCurveSelectionOptional", "", row=5)
+add_entry(f, "LC Start Bin Time", "LightCurveStartTime", "", row=2)
+add_entry(f, "LC Min Energy (TeV)", "LightCurveMinEnergy", "", row=3)
+add_entry(f, "LC NSigma", "LightCurveNSigma", "1", row=4)
+add_entry(f, "LC NSigma UL", "LightCurveNSigmaUL", "2", row=5)
+add_entry(f, "LC Selection Optional", "LightCurveSelectionOptional", "", row=6)
 add_entry(
     f,
     "LC Comparison Points (CSV)",
