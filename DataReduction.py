@@ -134,8 +134,11 @@ def RunDataReductionChain(
     os.makedirs(predicted_counts_dir, exist_ok=True)
     for i, dataset in enumerate(datasets):
         if args.Debug or i < 10:
-            ax_spectrum, ax_residuals = dataset.plot_fit()
-            ax_spectrum.set_ylim(0.1, 40)
+            with warnings.catch_warnings():
+                # Removes plotting warnings due to log / negative values
+                warnings.simplefilter("ignore", category=UserWarning)
+                ax_spectrum, ax_residuals = dataset.plot_fit()
+            ax_spectrum.set_yscale("linear")
             plt.savefig(predicted_counts_dir + f"/SpectrumFit_{dataset.name}.pdf")
             with open(path_to_log, "a") as f:
                 f.write(

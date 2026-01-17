@@ -67,6 +67,7 @@ from gammapy.visualization import plot_spectrum_datasets_off_regions
 style.use("tableau-colorblind10")
 
 # Suppress unnecessary warnings:
+
 from erfa import ErfaWarning
 
 warnings.filterwarnings("ignore", message=".*dubious year.*", category=ErfaWarning)

@@ -62,8 +62,8 @@ def GetExclusionRegions(target_position, args, path_to_log):
         f.write(" - A 0.1 degree exclusion region is used for the stars\n")
         f.write(" - A 0.3 degree exclusion region is used for the target\n")
         f.write("\n Bright Stars That Are Excluded: \n")
-        StarTable = Table(names=("RA_ICRS_", "DE_ICRS_", "BTmag"))
-        for row in result[0]["RA_ICRS_", "DE_ICRS_", "BTmag"]:
+        StarTable = Table(names=("RA(ICRS)", "DE(ICRS)", "BTmag"))
+        for row in result[0][["RA(ICRS)", "DE(ICRS)", "BTmag"]]:
             if row["BTmag"] < 6:
                 StarTable.add_row(row)
                 f.write(str(row) + "\n")
@@ -83,7 +83,7 @@ def GetExclusionRegions(target_position, args, path_to_log):
     # exclusion regions for bright stars
     for Star in StarTable:
         target_position_star = SkyCoord(
-            Star["RA_ICRS_"], Star["DE_ICRS_"], unit="deg"
+            Star["RA(ICRS)"], Star["DE(ICRS)"], unit="deg"
         ).icrs
         exclusion_regions.append(
             CircleSkyRegion(
