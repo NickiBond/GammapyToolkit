@@ -2,7 +2,7 @@
 """
 Author: Nicki Bond
 Date: 2025-Jan
-TLDR: - This script will take the VEGAS DL3 data files and use gammapy to do various science things like spectra and light curves.
+TLDR: This script will take the VEGAS DL3 data files and use gammapy 2.0 to do various science things
 
 Purpose:
 - It takes a set of DL3 files and makes an energy spectrum using Gammapy.
@@ -46,7 +46,7 @@ from EnergyAxes import EnergyAxes
 from GetGeometry import GetOnRegion, GetExclusionRegions, GetExclusionMask, GetOnRegionRadius
 from DataReduction import RunDataReductionChain
 from SpectralVariabilityPlots import MakeSpectralVariabilityPlots
-from LightCurve import MakeLightCurve, PlotLightCurve
+from LightCurve import MakeLightCurve
 from Spectrum import SpectrumTimeBins
 
 args = get_parser().parse_args()
@@ -192,7 +192,6 @@ with open(path_to_log, "a") as f:
 # Also plot LC with ED points if provided
 if args.LightCurve == True:
     lc = MakeLightCurve(path_to_log=path_to_log, datasets=all_datasets, args=args)
-    #PlotLightCurve(lc, path_to_log=path_to_log, args=args)
 ##############################################
 
 with open(path_to_log, "a") as f:
