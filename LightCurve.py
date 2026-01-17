@@ -10,7 +10,10 @@ def MakeLightCurve(path_to_log, datasets, args):
     else:
         e_min = args.EnergyAxisMin * u.TeV
     if args.LightCurveBinDuration is not None:
-        t_min = min([dataset.gti.time_start[0] for dataset in datasets])
+        if args.LightCurveStartTime is not None:
+            t_min = args.LightCurveStartTime
+        else:
+            t_min = min([dataset.gti.time_start[0] for dataset in datasets])
         t_max = max([dataset.gti.time_stop[-1] for dataset in datasets])
         time_bin_size = args.LightCurveBinDuration * u.day
         n_bins = int(((t_max - t_min) / time_bin_size).decompose())
@@ -20,12 +23,6 @@ def MakeLightCurve(path_to_log, datasets, args):
             current_end = min(current_start + args.LightCurveBinDuration * u.day, t_max)
             time_intervals.append([current_start, current_end])
             current_start = current_end
-
-        # #time_edges = t_min + TimeDelta([i * time_bin_size for i in range(n_bins + 1)])
-        # time_edges = t_min + TimeDelta(np.arange(n_bins + 1) * time_bin_size)
-        # print(f"Time edges: {time_edges}")
-        # time_axis = TimeMapAxis.from_time_edges(time_min=time_edges[:-1], time_max=time_edges[1:])
-        # print(f"Time axis: {time_axis}")
         lc_maker = LightCurveEstimator(
             energy_edges=[e_min, 30 * u.TeV],
             source=args.ObjectName,

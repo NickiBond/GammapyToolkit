@@ -1,5 +1,6 @@
 import argparse
 import re
+from astropy.time import Time
 
 
 def get_parser():
@@ -261,7 +262,7 @@ def get_parser():
     # Light Curve Parameters
     parser.add_argument(
         "-LightCurve",
-        help="Find Light Curve points and plot. default= False. Set to False to reduce runtime",
+        help="Find Light Curve points and plot. default= False.,
         action="store_true",
     )
     parser.add_argument(
@@ -315,6 +316,15 @@ def get_parser():
     )
 
     parser.add_argument(
+        "-LightCurveStartTime", 
+        type=parse_time,
+        help = "Start time for first bin of light curve. Accepts multiple unit options e.g. mjd:59000, jd:2459000.5, unix:1640995200, or ISO (2022-01-01). Only used if -LightCurveBinDuration is also provided",
+        required = False,
+        default = None,
+    )
+
+    # Exclusion Regions
+    parser.add_argument(
         "-exclusion_csv",
         help="Path to a CSV file containing user-defined exclusion regions."
         " The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
@@ -353,3 +363,20 @@ def CheckAllowedSpectralModelInputted(args):
             )
     else:
         raise ValueError("Only binary compound models are supported.")
+
+def parse_time(value):
+    try:
+        if ":" in value:
+            fmt, timestr = value.split(":", 1)
+            fmt = fmt.lower()
+            return Time(timestr, format=fmt, scale="utc")
+
+        # Fallback if no `:` in name.
+        return Time(value, scale="utc")
+
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            f"Invalid time '{value}'. "
+            "Use e.g. mjd:59000, jd:2459000.5, unix:1640995200, "
+            "or ISO (2022-01-01)."
+        )
