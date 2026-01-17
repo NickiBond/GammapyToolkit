@@ -262,7 +262,7 @@ def get_parser():
     # Light Curve Parameters
     parser.add_argument(
         "-LightCurve",
-        help="Find Light Curve points and plot. default= False.,
+        help="Find Light Curve points and plot. default= False.",
         action="store_true",
     )
     parser.add_argument(
@@ -316,11 +316,11 @@ def get_parser():
     )
 
     parser.add_argument(
-        "-LightCurveStartTime", 
+        "-LightCurveStartTime",
         type=parse_time,
-        help = "Start time for first bin of light curve. Accepts multiple unit options e.g. mjd:59000, jd:2459000.5, unix:1640995200, or ISO (2022-01-01). Only used if -LightCurveBinDuration is also provided",
-        required = False,
-        default = None,
+        help="Start time for first bin of light curve. Accepts multiple unit options e.g. mjd:59000, jd:2459000.5, unix:1640995200, or ISO (2022-01-01). Only used if -LightCurveBinDuration is also provided",
+        required=False,
+        default=None,
     )
 
     # Exclusion Regions
@@ -363,6 +363,7 @@ def CheckAllowedSpectralModelInputted(args):
             )
     else:
         raise ValueError("Only binary compound models are supported.")
+
 
 def parse_time(value):
     try:
