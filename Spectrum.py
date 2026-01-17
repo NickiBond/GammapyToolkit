@@ -1,5 +1,6 @@
 from importer import *
 
+
 def SpectrumTimeBins(args):
     time_bins = []
     try:
@@ -18,6 +19,8 @@ def SpectrumTimeBins(args):
         print(f"Error reading time bin file: {e}")
         sys.exit(1)
     return time_bins
+
+
 """
 def MakeSpectrumFluxPoints(observations, geom, energy_axis, energy_axis_true, on_region, exclusion_mask, args, tmin = None, tmax = None, path_to_log = None):
     f = open(path_to_log, "a")

@@ -7,6 +7,7 @@ from gammapy.maps import RegionGeom
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
 
+
 def GetOnRegionRadius(args, path_to_log):
     radius = None
     # Try reading RAD_MAX from IRF in header of first fits file (alphabetically)
@@ -20,7 +21,9 @@ def GetOnRegionRadius(args, path_to_log):
             if "EFFECTIVE AREA" in hdul and "RAD_MAX" in hdul["EFFECTIVE AREA"].header:
                 radius = hdul["EFFECTIVE AREA"].header["RAD_MAX"] * u.deg
                 with open(path_to_log, "a") as f:
-                    f.write(f"Using IRF-defined RAD_MAX = {radius.value} deg for On Region\n")
+                    f.write(
+                        f"Using IRF-defined RAD_MAX = {radius.value} deg for On Region\n"
+                    )
     except Exception as irf_error:
         print(f"[WARNING] Could not read RAD_MAX from IRF: {irf_error}")
         with open(path_to_log, "a") as f:
@@ -35,6 +38,7 @@ def GetOnRegionRadius(args, path_to_log):
         sys.exit(1)
     return radius
 
+
 def GetOnRegion(target_position, args, energy_axis, path_to_log, on_region_radius):
     # Build region
     on_region = CircleSkyRegion(center=target_position, radius=on_region_radius)
@@ -43,6 +47,7 @@ def GetOnRegion(target_position, args, energy_axis, path_to_log, on_region_radiu
         f.write(f"On Region: {on_region}\n")
     geom = RegionGeom.create(region=on_region, axes=[energy_axis])
     return on_region, geom
+
 
 def GetExclusionRegions(target_position, args, path_to_log):
     vizier = Vizier(catalog="Tycho2")
@@ -68,18 +73,25 @@ def GetExclusionRegions(target_position, args, path_to_log):
     exclusion_regions = []
     exclusion_regions.append(
         CircleSkyRegion(
-            center=SkyCoord(target_position.ra, target_position.dec, unit="deg", frame ='icrs'),
+            center=SkyCoord(
+                target_position.ra, target_position.dec, unit="deg", frame="icrs"
+            ),
             radius=0.3 * u.deg,
         )
     )
 
     # exclusion regions for bright stars
     for Star in StarTable:
-        target_position_star = SkyCoord(Star["RA_ICRS_"], Star["DE_ICRS_"], unit="deg").icrs
+        target_position_star = SkyCoord(
+            Star["RA_ICRS_"], Star["DE_ICRS_"], unit="deg"
+        ).icrs
         exclusion_regions.append(
             CircleSkyRegion(
                 center=SkyCoord(
-                    target_position_star.ra, target_position_star.dec, unit="deg", frame='icrs'
+                    target_position_star.ra,
+                    target_position_star.dec,
+                    unit="deg",
+                    frame="icrs",
                 ),
                 radius=0.1 * u.deg,
             )
@@ -95,19 +107,22 @@ def GetExclusionRegions(target_position, args, path_to_log):
 
     return exclusion_regions
 
+
 def GetExclusionMask(exclusion_regions, target_position, energy_axis):
     exclusion_mask_geom = WcsGeom.create(
         binsz=0.01,  # in degrees
-        width = (6, 6),
+        width=(6, 6),
         skydir=target_position,
         proj="CAR",
-        frame ="icrs",
-        axes = [energy_axis]
+        frame="icrs",
+        axes=[energy_axis],
     )
-    exclusion_mask = ~exclusion_mask_geom.to_image().to_cube([energy_axis.squash()]).region_mask(exclusion_regions)
+    exclusion_mask = (
+        ~exclusion_mask_geom.to_image()
+        .to_cube([energy_axis.squash()])
+        .region_mask(exclusion_regions)
+    )
     return exclusion_mask
-
-
 
 
 def read_exclusion_csv(csv_path):
@@ -145,8 +160,6 @@ def read_exclusion_csv(csv_path):
             # e.g. 0.2 → assume degrees
             radius = radius_val * u.deg
 
-        regions.append(
-            CircleSkyRegion(center=coord, radius=radius)
-        )
+        regions.append(CircleSkyRegion(center=coord, radius=radius))
 
     return regions

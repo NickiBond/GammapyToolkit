@@ -16,7 +16,7 @@ def DiagnosticsTotalTimeStats(path_to_log, obs_table, args):
 def DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args):
     with open(path_to_log, "a") as f:
         f.write("Making Deadtime distribution plot:\n")
-        plt.hist(1-obs_table["DEADC"])
+        plt.hist(1 - obs_table["DEADC"])
         plt.xlabel("Deadtime")
         plt.ylabel("Number of Observations")
         plt.title(f'1 - obstable["DEADC"] Distribution')
@@ -31,7 +31,9 @@ def DiagnosticsDeadtimeDistribution(path_to_log, obs_table, args):
         f.write("Deadtime Statistics:\n")
         f.write(f"Run Number, On Time (s), Livetime (s), Deadtime Fraction\n")
         for i, row in enumerate(obs_table):
-            f.write(f"{row['OBS_ID']}, {row['ONTIME']:.4f}, {row['LIVETIME']:.4f}, {1 - row['DEADC']:.4f}\n")
+            f.write(
+                f"{row['OBS_ID']}, {row['ONTIME']:.4f}, {row['LIVETIME']:.4f}, {1 - row['DEADC']:.4f}\n"
+            )
         f.write("--------------------------------------------------\n")
     return
 
@@ -103,9 +105,13 @@ def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
     os.makedirs(irf_dir, exist_ok=True)
     # Generate and save IRF plots
     with open(path_to_log, "a") as f:
-        f.write("Peek at IRFs for first 10 observations (or all observations if less than 10):\n")
+        f.write(
+            "Peek at IRFs for first 10 observations (or all observations if less than 10):\n"
+        )
         for i, obs in enumerate(observations):
-            if i < 10 or args.Debug:  # Limit to 10 datasets for plotting to save time unless Debug is set to True
+            if (
+                i < 10 or args.Debug
+            ):  # Limit to 10 datasets for plotting to save time unless Debug is set to True
                 obs.peek(figsize=(25, 5))
                 fig = plt.gcf()  # Get the current figure
                 obs_id = obs.obs_id
@@ -115,15 +121,20 @@ def DiagnosticsPeekAtIRFs(path_to_log, observations, args):
                 f.write(f"Saved IRF figure for Obs ID {obs_id} to {filepath}\n")
                 plt.close(fig)
 
+
 def DiagnosticsPeekAtEvents(path_to_log, observations, args):
     event_dir = os.path.join(args.ADir, "Diagnostics/Event_Plots")
     os.makedirs(event_dir, exist_ok=True)
     # Generate and save event plots
     with open(path_to_log, "a") as f:
         f.write("--------------------------------------------------\n")
-        f.write("Peek at Events for first 10 observations (or all observations if less than 10):\n")
+        f.write(
+            "Peek at Events for first 10 observations (or all observations if less than 10):\n"
+        )
         for i, obs in enumerate(observations):
-            if i < 10 or args.Debug:  # Limit to 10 datasets for plotting to save time unless Debug is set to True
+            if (
+                i < 10 or args.Debug
+            ):  # Limit to 10 datasets for plotting to save time unless Debug is set to True
                 obs.events.peek()
                 fig = plt.gcf()  # Get the current figure
                 obs_id = obs.obs_id
@@ -135,37 +146,55 @@ def DiagnosticsPeekAtEvents(path_to_log, observations, args):
                 i += 1
     return
 
+
 def check_livetimes(obs_table, all_datasets, observations, path_to_log):
-    obs_table_livetime_sum=0
-    info_table_livetime_sum=0
+    obs_table_livetime_sum = 0
+    info_table_livetime_sum = 0
     with open(path_to_log, "a") as f:
         f.write("--------------------------------------------------\n")
         f.write("Diagnostics: Check Livetime matches in obs_table and info_table\n")
     for i in range(len(observations)):
-        obs_table_livetime = obs_table['LIVETIME'][i]
+        obs_table_livetime = obs_table["LIVETIME"][i]
         obs_table_livetime_sum += obs_table_livetime
-        info_table_livetime= all_datasets.info_table(cumulative = False)['livetime'][i]
+        info_table_livetime = all_datasets.info_table(cumulative=False)["livetime"][i]
         info_table_livetime_sum += info_table_livetime
-        if obs_table_livetime/info_table_livetime < 0.99 or obs_table_livetime/info_table_livetime > 1.01:
-            print(f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}")
-            print(f"WARNING! obs_table livetime / info_table livetime: {obs_table_livetime/info_table_livetime:.2f}")
+        if (
+            obs_table_livetime / info_table_livetime < 0.99
+            or obs_table_livetime / info_table_livetime > 1.01
+        ):
+            print(
+                f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}"
+            )
+            print(
+                f"WARNING! obs_table livetime / info_table livetime: {obs_table_livetime/info_table_livetime:.2f}"
+            )
             with open(path_to_log, "a") as f:
-                f.write(f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}\n")
-                f.write(f"WARNING! obs_table livetime / info_table livetime: {obs_table_livetime/info_table_livetime:.2f}\n")
+                f.write(
+                    f"WARNING!: Run: {observations[i].obs_id}: obs_table livetime: {obs_table_livetime} info_table livetime: {info_table_livetime}\n"
+                )
+                f.write(
+                    f"WARNING! obs_table livetime / info_table livetime: {obs_table_livetime/info_table_livetime:.2f}\n"
+                )
     with open(path_to_log, "a") as f:
         f.write("--------------------------------------------------\n")
         f.write(f"Total Livetime from obs_table: {obs_table_livetime_sum}\n")
         f.write(f"Total Livetime from info_table: {info_table_livetime_sum}\n")
-        f.write(f"Difference: {abs(obs_table_livetime_sum - info_table_livetime_sum)}\n")
+        f.write(
+            f"Difference: {abs(obs_table_livetime_sum - info_table_livetime_sum)}\n"
+        )
         if abs(obs_table_livetime_sum - info_table_livetime_sum) > 1:
-            f.write("WARNING! Total livetime from obs_table and info_table do not match!\n")
-            
+            f.write(
+                "WARNING! Total livetime from obs_table and info_table do not match!\n"
+            )
+
+
 def SaveInfoTable(datasets, args):
-    info_table = datasets.info_table(cumulative = False)
+    info_table = datasets.info_table(cumulative=False)
     info_table.write(
         os.path.join(args.ADir, "Diagnostics/InfoTable.ecsv"), overwrite=True
     )
     return info_table
+
 
 def PlotOnOffEvents(info_table_not_cumulative, args, path_to_log):
     on = info_table_not_cumulative["counts"]
@@ -187,11 +216,13 @@ def PlotOnOffEvents(info_table_not_cumulative, args, path_to_log):
     plt.close(fig)
 
     plt.figure(figsize=(8, 6))
-    plt.scatter(on.value, off.value, color='purple')
+    plt.scatter(on.value, off.value, color="purple")
     plt.xlabel("On Counts")
     plt.ylabel("Off Counts")
     plt.title("On/Off Counts Scatter Plot")
     plt.savefig(os.path.join(args.ADir, "Diagnostics/OnOffCounts_Scatter.pdf"))
     with open(path_to_log, "a") as f:
-        f.write("Saved On/Off Counts Scatter figure to Diagnostics/OnOffCounts_Scatter.pdf\n")
+        f.write(
+            "Saved On/Off Counts Scatter figure to Diagnostics/OnOffCounts_Scatter.pdf\n"
+        )
     plt.close()

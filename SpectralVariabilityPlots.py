@@ -1,5 +1,6 @@
 from importer import *
 
+
 def MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args):
     MeanTimes = []
     Index = []
@@ -9,9 +10,15 @@ def MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args):
     with open(path_to_log, "a") as f:
         f.write("--------------------------------------------------\n")
         f.write("Spectral Variability: \n")
-        f.write("Plots saved to: " + args.ADir + "SpectralVariability/SpectralVariabilityNorm.pdf and " + args.ADir + "SpectralVariability/SpectralVariabilityIndex.pdf\n")
+        f.write(
+            "Plots saved to: "
+            + args.ADir
+            + "SpectralVariability/SpectralVariabilityNorm.pdf and "
+            + args.ADir
+            + "SpectralVariability/SpectralVariabilityIndex.pdf\n"
+        )
         for (tmin, tmax), fit_result in zip(time_bins, fit_results):
-            MeanTimes.append((tmax+tmin)/2)
+            MeanTimes.append((tmax + tmin) / 2)
             Index.append(fit_result.parameters["index"].value)
             IndexErr.append(fit_result.parameters["index"].error)
             Norm.append(fit_result.parameters["amplitude"].value)
@@ -32,6 +39,8 @@ def MakeSpectralVariabilityPlots(fit_results, time_bins, path_to_log, args):
         plt.errorbar(Index, Norm, xerr=IndexErr, yerr=NormErr, fmt="o", color="blue")
         plt.xlabel("Index")
         plt.ylabel(r"Norm [TeV$^{-1}$ s$^{-1}$ cm$^{-2}$]")
-        plt.savefig(args.ADir + f"/SpectralVariability/SpectralVariabilityIndexNorm.pdf")
+        plt.savefig(
+            args.ADir + f"/SpectralVariability/SpectralVariabilityIndexNorm.pdf"
+        )
         plt.close()
         f.write("--------------------------------------------------\n")

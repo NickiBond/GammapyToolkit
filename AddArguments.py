@@ -1,6 +1,7 @@
 import argparse
 import re
 
+
 def get_parser():
     parser = argparse.ArgumentParser(
         description="DL3 to Dl5 in Gammapy\narguments are as follows: \n",
@@ -10,7 +11,7 @@ def get_parser():
     parser.add_argument(
         "-Debug",
         help="Make all the debugging plots (i.e. for some plots 1 per run rather than the max of 10). Note: this slows down analysis.Default is False.",
-        action="store_true"
+        action="store_true",
     )
 
     # Data Selection Parameters
@@ -70,7 +71,7 @@ def get_parser():
         help="Radius of the on region in degrees, default = None, in which case the radius from the IRF will be used (point-like)",
         type=float,
         required=False,
-        default=None
+        default=None,
     )
     parser.add_argument(
         "-BackgroundMaker",
@@ -111,62 +112,129 @@ def get_parser():
 
     # --- PowerLaw group ---
     pl_group = parser.add_argument_group("PowerLaw Spectral Model")
-    pl_group.add_argument("-PowerLawIndex", type=float, default=2.0,
-                        help="Index of Power Law, default = 2.0")
-    pl_group.add_argument("-PowerLawAmplitude", type=float, default=1e-12,
-                        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12")
-    pl_group.add_argument("-PowerLawReferenceEnergy", type=float, default=1.0,
-                        help="Reference energy in TeV, default = 1.0")
+    pl_group.add_argument(
+        "-PowerLawIndex",
+        type=float,
+        default=2.0,
+        help="Index of Power Law, default = 2.0",
+    )
+    pl_group.add_argument(
+        "-PowerLawAmplitude",
+        type=float,
+        default=1e-12,
+        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12",
+    )
+    pl_group.add_argument(
+        "-PowerLawReferenceEnergy",
+        type=float,
+        default=1.0,
+        help="Reference energy in TeV, default = 1.0",
+    )
 
     # --- PowerLawCutOff group ---
     plco_group = parser.add_argument_group("PowerLaw with Exponential Cut Off")
-    plco_group.add_argument("-PowerLawCutOffIndex", type=float, default=1.5,
-                            help="Index, default = 1.5")
-    plco_group.add_argument("-PowerLawCutOffAmplitude", type=float, default=1e-12,
-                            help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12")
-    plco_group.add_argument("-PowerLawCutOffReferenceEnergy", type=float, default=1.0,
-                            help="Reference Energy in TeV, default = 1.0")
-    plco_group.add_argument("-PowerLawCutOffAlpha", type=float, default=1.0,
-                            help="Alpha, default = 1.0")
-    plco_group.add_argument("-PowerLawCutOffLambda", type=float, default=0.1,
-                            help="Lambda in TeV^-1, default = 0.1")
+    plco_group.add_argument(
+        "-PowerLawCutOffIndex", type=float, default=1.5, help="Index, default = 1.5"
+    )
+    plco_group.add_argument(
+        "-PowerLawCutOffAmplitude",
+        type=float,
+        default=1e-12,
+        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12",
+    )
+    plco_group.add_argument(
+        "-PowerLawCutOffReferenceEnergy",
+        type=float,
+        default=1.0,
+        help="Reference Energy in TeV, default = 1.0",
+    )
+    plco_group.add_argument(
+        "-PowerLawCutOffAlpha", type=float, default=1.0, help="Alpha, default = 1.0"
+    )
+    plco_group.add_argument(
+        "-PowerLawCutOffLambda",
+        type=float,
+        default=0.1,
+        help="Lambda in TeV^-1, default = 0.1",
+    )
 
     # --- BrokenPowerLaw group ---
     bpl_group = parser.add_argument_group("Broken Power Law")
-    bpl_group.add_argument("-BrokenPowerLawIndex1", type=float, default=2.0,
-                        help="Index 1, default = 2.0")
-    bpl_group.add_argument("-BrokenPowerLawIndex2", type=float, default=2.0,
-                        help="Index 2, default = 2.0")
-    bpl_group.add_argument("-BrokenPowerLawAmplitude", type=float, default=1e-12,
-                        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12")
-    bpl_group.add_argument("-BrokenPowerLawEnergyBreak", type=float, default=1.0,
-                        help="Energy Break in TeV, default = 1.0")
+    bpl_group.add_argument(
+        "-BrokenPowerLawIndex1", type=float, default=2.0, help="Index 1, default = 2.0"
+    )
+    bpl_group.add_argument(
+        "-BrokenPowerLawIndex2", type=float, default=2.0, help="Index 2, default = 2.0"
+    )
+    bpl_group.add_argument(
+        "-BrokenPowerLawAmplitude",
+        type=float,
+        default=1e-12,
+        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12",
+    )
+    bpl_group.add_argument(
+        "-BrokenPowerLawEnergyBreak",
+        type=float,
+        default=1.0,
+        help="Energy Break in TeV, default = 1.0",
+    )
 
     # --- LogParabola group ---
     lp_group = parser.add_argument_group("Log Parabola")
-    lp_group.add_argument("-LogParabolaAmplitude", type=float, default=1e-12,
-                        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12")
-    lp_group.add_argument("-LogParabolaReferenceEnergy", type=float, default=10.0,
-                        help="Reference energy in TeV, default = 10.0")
-    lp_group.add_argument("-LogParabolaAlpha", type=float, default=2.0,
-                        help="Alpha, default = 2.0")
-    lp_group.add_argument("-LogParabolaBeta", type=float, default=1.0,
-                        help="Beta, default = 1.0")
+    lp_group.add_argument(
+        "-LogParabolaAmplitude",
+        type=float,
+        default=1e-12,
+        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12",
+    )
+    lp_group.add_argument(
+        "-LogParabolaReferenceEnergy",
+        type=float,
+        default=10.0,
+        help="Reference energy in TeV, default = 10.0",
+    )
+    lp_group.add_argument(
+        "-LogParabolaAlpha", type=float, default=2.0, help="Alpha, default = 2.0"
+    )
+    lp_group.add_argument(
+        "-LogParabolaBeta", type=float, default=1.0, help="Beta, default = 1.0"
+    )
 
     # --- SmoothBrokenPowerLaw group ---
     sbpl_group = parser.add_argument_group("Smooth Broken Power Law")
-    sbpl_group.add_argument("-SmoothBrokenPowerLawIndex1", type=float, default=2.0,
-                            help="Index 1, default = 2.0")
-    sbpl_group.add_argument("-SmoothBrokenPowerLawIndex2", type=float, default=2.0,
-                            help="Index 2, default = 2.0")
-    sbpl_group.add_argument("-SmoothBrokenPowerLawAmplitude", type=float, default=1e-12,
-                            help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12")
-    sbpl_group.add_argument("-SmoothBrokenPowerLawEnergyBreak", type=float, default=1.0,
-                            help="Energy Break in TeV, default = 1.0")
-    sbpl_group.add_argument("-SmoothBrokenPowerLawReferenceEnergy", type=float, default=1.0,
-                            help="Reference Energy in TeV, default = 1.0")
-    sbpl_group.add_argument("-SmoothBrokenPowerLawBeta", type=float, default=1.0,
-                            help="Beta, default = 1.0")
+    sbpl_group.add_argument(
+        "-SmoothBrokenPowerLawIndex1",
+        type=float,
+        default=2.0,
+        help="Index 1, default = 2.0",
+    )
+    sbpl_group.add_argument(
+        "-SmoothBrokenPowerLawIndex2",
+        type=float,
+        default=2.0,
+        help="Index 2, default = 2.0",
+    )
+    sbpl_group.add_argument(
+        "-SmoothBrokenPowerLawAmplitude",
+        type=float,
+        default=1e-12,
+        help="Amplitude in cm-2 s-1 TeV-1, default = 1e-12",
+    )
+    sbpl_group.add_argument(
+        "-SmoothBrokenPowerLawEnergyBreak",
+        type=float,
+        default=1.0,
+        help="Energy Break in TeV, default = 1.0",
+    )
+    sbpl_group.add_argument(
+        "-SmoothBrokenPowerLawReferenceEnergy",
+        type=float,
+        default=1.0,
+        help="Reference Energy in TeV, default = 1.0",
+    )
+    sbpl_group.add_argument(
+        "-SmoothBrokenPowerLawBeta", type=float, default=1.0, help="Beta, default = 1.0"
+    )
 
     # SED Parameters
     parser.add_argument(
@@ -248,13 +316,14 @@ def get_parser():
 
     parser.add_argument(
         "-exclusion_csv",
-        help="Path to a CSV file containing user-defined exclusion regions." \
+        help="Path to a CSV file containing user-defined exclusion regions."
         " The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
         type=str,
         required=False,
         default=None,
     )
     return parser
+
 
 def CheckAllowedSpectralModelInputted(args):
     AllowedModels = [
@@ -264,18 +333,23 @@ def CheckAllowedSpectralModelInputted(args):
         "LogParabola",
         "SmoothBrokenPowerLaw",
     ]
-    parts = re.split(r'([*+])', args.SpectralModel)
+    parts = re.split(r"([*+])", args.SpectralModel)
     if len(parts) == 1:
         if parts[0] not in AllowedModels:
-            raise ValueError(f"Unsupported spectral model: {parts[0]}. Allowed models are: {', '.join(AllowedModels)}")
+            raise ValueError(
+                f"Unsupported spectral model: {parts[0]}. Allowed models are: {', '.join(AllowedModels)}"
+            )
     elif len(parts) == 3:
         model1, operator, model2 = parts
         if operator not in ["*", "+"]:
             raise ValueError(f"Unsupported operator: {operator}")
         if model1 not in AllowedModels:
-            raise ValueError(f"Unsupported spectral model: {model1}. Allowed models are: {', '.join(AllowedModels)}")
+            raise ValueError(
+                f"Unsupported spectral model: {model1}. Allowed models are: {', '.join(AllowedModels)}"
+            )
         if model2 not in AllowedModels:
-            raise ValueError(f"Unsupported spectral model: {model2}. Allowed models are: {', '.join(AllowedModels)}")
+            raise ValueError(
+                f"Unsupported spectral model: {model2}. Allowed models are: {', '.join(AllowedModels)}"
+            )
     else:
         raise ValueError("Only binary compound models are supported.")
-    

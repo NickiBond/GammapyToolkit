@@ -60,6 +60,7 @@ help_dict = {
     "exclusion_csv": "Path to a CSV file containing user-defined exclusion regions. The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
 }
 
+
 # --- Tooltip class ---
 class CreateToolTip:
     def __init__(self, widget, text):
@@ -80,11 +81,15 @@ class CreateToolTip:
         tw.geometry(f"+{x}+{y}")
 
         label = tk.Label(
-            tw, text=self.text, justify="left",
-            background="#333333",       # Dark background
-            foreground="white",           # Light text
-            relief="solid", borderwidth=1,
-            font=("tahoma", "9", "normal"), wraplength=300
+            tw,
+            text=self.text,
+            justify="left",
+            background="#333333",  # Dark background
+            foreground="white",  # Light text
+            relief="solid",
+            borderwidth=1,
+            font=("tahoma", "9", "normal"),
+            wraplength=300,
         )
         label.pack(ipadx=1)
 
@@ -94,6 +99,7 @@ class CreateToolTip:
         if tw:
             tw.destroy()
 
+
 # --- Browsing logic ---
 def browse_folder(entry):
     path = filedialog.askdirectory()
@@ -101,39 +107,44 @@ def browse_folder(entry):
         entry.delete(0, tk.END)
         entry.insert(0, path)
 
+
 def browse_file(entry):
     path = filedialog.askopenfilename()
     if path:
         entry.delete(0, tk.END)
         entry.insert(0, path)
+
+
 def load_json_config():
     """Load JSON configuration and populate form fields"""
     path = filedialog.askopenfilename(
-        filetypes=[("JSON Files", "*.json")],
-        title="Select JSON Configuration"
+        filetypes=[("JSON Files", "*.json")], title="Select JSON Configuration"
     )
     if not path:
         return
-    
+
     try:
         with open(path, "r") as f:
             config = json.load(f)
-        
+
         # Populate the form with loaded configuration
         populate_form_from_config(config)
-        
-        tk.messagebox.showinfo("Success", f"Configuration loaded from {os.path.basename(path)}")
-        
+
+        tk.messagebox.showinfo(
+            "Success", f"Configuration loaded from {os.path.basename(path)}"
+        )
+
     except json.JSONDecodeError:
         tk.messagebox.showerror("Error", "Invalid JSON file")
     except Exception as e:
         tk.messagebox.showerror("Error", f"Failed to load JSON: {str(e)}")
 
+
 def populate_form_from_config(config):
     """Populate all form fields from a configuration dictionary"""
     # Clear existing form first
     reset_form()
-    
+
     # Populate text entries
     for key, val in config.items():
         if key in entries:
@@ -150,10 +161,10 @@ def populate_form_from_config(config):
         elif key == "BackgroundMaker":
             if str(val) in ["ReflectedRegions"]:  # Add more options as needed
                 background_maker_var.set(str(val))
-    
+
     # Update spectral fields with the loaded configuration
     update_spectral_fields(saved_args=config)
-    
+
     # Populate any spectral parameters that were loaded
     for key, val in config.items():
         if key in spectral_entries:
@@ -161,15 +172,17 @@ def populate_form_from_config(config):
             entry.delete(0, tk.END)
             entry.insert(0, str(val))
 
+
 def save_json_config():
     """Save current configuration to a JSON file"""
     path = filedialog.asksaveasfilename(
         defaultextension=".json",
         filetypes=[("JSON Files", "*.json")],
-        title="Save Configuration As"
+        title="Save Configuration As",
     )
     if not path:
         return
+
 
 # --- Script execution ---
 def run_script():
@@ -182,7 +195,7 @@ def run_script():
 
             args = [
                 "/Users/nickibond/NBvenv/bin/python",
-                "/Users/nickibond/Documents/Research/Toolkit/DL3toDL5.py"
+                "/Users/nickibond/Documents/Research/Toolkit/DL3toDL5.py",
             ]
 
             saved_data = {}
@@ -214,7 +227,6 @@ def run_script():
             saved_data["BackgroundMaker"] = background_maker_var.get()
             args += ["-BackgroundMaker", background_maker_var.get()]
 
-
             # Spectral parameters for compound models
             # Flatten spectral_entries dict: keys are compound keys like 'PowerLaw_Index', 'LogParabola_Alpha', etc.
             for key, (label, entry) in spectral_entries.items():
@@ -236,7 +248,9 @@ def run_script():
             status_var.set("Finished!")
         except Exception as e:
             status_var.set(f"Error: {str(e)}")
+
     threading.Thread(target=run).start()
+
 
 # --- Show help ---
 def show_help():
@@ -252,6 +266,7 @@ def show_help():
     scrollbar.pack(side="right", fill="y")
     text.config(yscrollcommand=scrollbar.set)
 
+
 # --- Reset form ---
 def reset_form():
     for entry in entries.values():
@@ -264,6 +279,7 @@ def reset_form():
     update_spectral_fields()
     if os.path.exists("last_used_args.json"):
         os.remove("last_used_args.json")
+
 
 # --- GUI setup ---
 root = tk.Tk()
@@ -285,6 +301,7 @@ notebook.pack(fill="both", expand=True)
 buttons_frame = tk.Frame(right_frame)
 buttons_frame.pack(side="bottom", pady=10)
 
+
 # --- Add entry with tooltip ---
 def add_entry(frame, label_text, key, default="", browse=False, folder=False, row=None):
     label = tk.Label(frame, text=label_text)
@@ -293,19 +310,19 @@ def add_entry(frame, label_text, key, default="", browse=False, folder=False, ro
     label.grid(row=row, column=0, sticky="e", padx=5, pady=2)
     entry.grid(row=row, column=1, pady=2, padx=2)
     if browse:
-        btn = tk.Button(frame, text="Browse", command=lambda: browse_folder(entry) if folder else browse_file(entry))
+        btn = tk.Button(
+            frame,
+            text="Browse",
+            command=lambda: browse_folder(entry) if folder else browse_file(entry),
+        )
         btn.grid(row=row, column=2, padx=2)
     if key in help_dict:
         CreateToolTip(entry, help_dict[key])
     entries[key] = entry
 
+
 # --- Tabs ---
-sections = {
-    "Data Selection": {},
-    "Energy Axis": {},
-    "SED": {},
-    "Light Curve": {}
-}
+sections = {"Data Selection": {}, "Energy Axis": {}, "SED": {}, "Light Curve": {}}
 frames = {}
 for section in sections:
     frame = ttk.Frame(notebook)
@@ -321,7 +338,9 @@ label.grid(row=1, column=0, sticky="e", padx=5, pady=2)
 tk.Checkbutton(f, variable=include_nearby_var).grid(row=1, column=1, sticky="w", pady=2)
 CreateToolTip(label, help_dict["IncludeNearby"])
 add_entry(f, "DL3 Path", "DL3Path", "./DL3", browse=True, folder=True, row=2)
-add_entry(f, "Analysis Output Dir", "ADir", "./Analysis", browse=True, folder=True, row=3)
+add_entry(
+    f, "Analysis Output Dir", "ADir", "./Analysis", browse=True, folder=True, row=3
+)
 add_entry(f, "Run List File", "RunList", "", browse=True, row=4)
 add_entry(f, "Exclude Run List File", "RunExcludeList", "", browse=True, row=5)
 add_entry(f, "From Date", "FromDate", "2007-01-01T00:00:00", row=6)
@@ -330,9 +349,14 @@ add_entry(f, "On Region Radius (deg)", "OnRegionRadius", "0.07071068", row=8)
 background_maker_options = ["ReflectedRegions"]
 background_maker_var = tk.StringVar(value="ReflectedRegions")  # Default
 tk.Label(f, text="Background Maker").grid(row=9, column=0, sticky="e", padx=5, pady=2)
-background_maker_menu = tk.OptionMenu(f, background_maker_var, *background_maker_options)
+background_maker_menu = tk.OptionMenu(
+    f, background_maker_var, *background_maker_options
+)
 background_maker_menu.grid(row=9, column=1, sticky="w", padx=5, pady=2)
-CreateToolTip(background_maker_menu, help_dict.get("BackgroundMaker", "Choose background estimation method."))
+CreateToolTip(
+    background_maker_menu,
+    help_dict.get("BackgroundMaker", "Choose background estimation method."),
+)
 debug_mode_var = tk.BooleanVar(value=False)
 label = tk.Label(f, text="Make Debug Plots?")
 label.grid(row=10, column=0, sticky="e", padx=5, pady=2)
@@ -349,7 +373,14 @@ add_entry(f, "Energy Axis Bins", "EnergyAxisBins", "10", row=2)
 f = frames["SED"]
 add_entry(f, "VEGAS Log File", "VEGASLogFile", "", browse=True, row=0)
 add_entry(f, "Integral Flux Min Energy", "IntegralFluxMinEnergy", "0.2", row=1)
-add_entry(f, "Spectral Variability Time Bin File", "SpectralVariabilityTimeBinFile", "", browse=True, row=2)
+add_entry(
+    f,
+    "Spectral Variability Time Bin File",
+    "SpectralVariabilityTimeBinFile",
+    "",
+    browse=True,
+    row=2,
+)
 
 # --- Light Curve tab ---
 f = frames["Light Curve"]
@@ -363,8 +394,17 @@ add_entry(f, "LC Min Energy (TeV)", "LightCurveMinEnergy", "", row=2)
 add_entry(f, "LC NSigma", "LightCurveNSigma", "1", row=3)
 add_entry(f, "LC NSigma UL", "LightCurveNSigmaUL", "2", row=4)
 add_entry(f, "LC Selection Optional", "LightCurveSelectionOptional", "", row=5)
-add_entry(f, "LC Comparison Points (CSV)", "LightCurveComparisonPoints", "", browse=True, row=6)
-add_entry(f, "LC Comparison ULs (CSV)", "LightCurveComparisonULs", "", browse=True, row=7)
+add_entry(
+    f,
+    "LC Comparison Points (CSV)",
+    "LightCurveComparisonPoints",
+    "",
+    browse=True,
+    row=6,
+)
+add_entry(
+    f, "LC Comparison ULs (CSV)", "LightCurveComparisonULs", "", browse=True, row=7
+)
 
 # --- Spectral Model tab with compound models ---
 f = ttk.Frame(notebook)
@@ -373,7 +413,9 @@ frames["Spectral Model"] = f
 
 spectral_model_var = tk.StringVar(value="PowerLaw")  # Default selection
 
-tk.Label(f, text="Spectral Model (compound allowed)").grid(row=0, column=0, sticky="e", padx=5, pady=2)
+tk.Label(f, text="Spectral Model (compound allowed)").grid(
+    row=0, column=0, sticky="e", padx=5, pady=2
+)
 model_entry = tk.Entry(f, textvariable=spectral_model_var, width=30)
 model_entry.grid(row=0, column=1, sticky="w", padx=5, pady=2)
 CreateToolTip(model_entry, help_dict["SpectralModel"])
@@ -415,7 +457,7 @@ spectral_model_parameters = {
         ("Amplitude (cm⁻² s⁻¹ TeV⁻¹)", "SmoothBrokenPowerLawAmplitude"),
         ("Reference Energy (TeV)", "SmoothBrokenPowerLawReferenceEnergy"),
         ("Beta", "SmoothBrokenPowerLawBeta"),
-    ]
+    ],
 }
 
 DEFAULT_ARGS = {
@@ -423,26 +465,22 @@ DEFAULT_ARGS = {
     "PowerLawIndex": 2.0,
     "PowerLawAmplitude": 1e-12,
     "PowerLawReferenceEnergy": 1.0,
-
     # PowerLaw with Cutoff
     "PowerLawCutOffIndex": 1.5,
     "PowerLawCutOffAmplitude": 1e-12,
     "PowerLawCutOffReferenceEnergy": 1.0,
     "PowerLawCutOffAlpha": 1.0,
     "PowerLawCutOffLambda": 0.1,
-
     # Broken Power Law
     "BrokenPowerLawIndex1": 2.0,
     "BrokenPowerLawIndex2": 2.0,
     "BrokenPowerLawAmplitude": 1e-12,
     "BrokenPowerLawEnergyBreak": 1.0,
-
     # Log Parabola
     "LogParabolaAmplitude": 1e-12,
     "LogParabolaReferenceEnergy": 10.0,
     "LogParabolaAlpha": 2.0,
     "LogParabolaBeta": 1.0,
-
     # Smooth Broken Power Law
     "SmoothBrokenPowerLawIndex1": 2.0,
     "SmoothBrokenPowerLawIndex2": 2.0,
@@ -452,10 +490,12 @@ DEFAULT_ARGS = {
     "SmoothBrokenPowerLawBeta": 1.0,
 }
 
+
 def clear_spectral_params():
     for widget in spectral_params_frame.winfo_children():
         widget.destroy()
     spectral_entries.clear()
+
 
 def update_spectral_fields(event=None, saved_args=None):
     if saved_args is None:
@@ -466,10 +506,16 @@ def update_spectral_fields(event=None, saved_args=None):
     for model in models:
         model = model.strip()
         if model not in spectral_model_parameters:
-            tk.Label(spectral_params_frame, text=f"Unknown model: {model}", fg="red").grid(row=row, column=0, sticky="w")
+            tk.Label(
+                spectral_params_frame, text=f"Unknown model: {model}", fg="red"
+            ).grid(row=row, column=0, sticky="w")
             row += 1
             continue
-        tk.Label(spectral_params_frame, text=f"{model} parameters:", font=("Helvetica", 10, "bold")).grid(row=row, column=0, sticky="w", pady=(10, 2))
+        tk.Label(
+            spectral_params_frame,
+            text=f"{model} parameters:",
+            font=("Helvetica", 10, "bold"),
+        ).grid(row=row, column=0, sticky="w", pady=(10, 2))
         row += 1
         for param_label, param_key in spectral_model_parameters[model]:
             label = tk.Label(spectral_params_frame, text=param_label)
@@ -492,13 +538,21 @@ model_entry.bind("<Return>", lambda event: update_spectral_fields(saved_args))
 
 
 # --- Buttons ---
-tk.Button(buttons_frame, text="Run Script", command=run_script).pack(side="left", padx=10)
+tk.Button(buttons_frame, text="Run Script", command=run_script).pack(
+    side="left", padx=10
+)
 tk.Button(buttons_frame, text="Help", command=show_help).pack(side="left", padx=10)
 tk.Button(buttons_frame, text="Reset", command=reset_form).pack(side="left", padx=10)
-tk.Button(buttons_frame, text="Load Config", command=load_json_config).pack(side="left", padx=10)
-tk.Button(buttons_frame, text="Save Config", command=save_json_config).pack(side="left", padx=10)
+tk.Button(buttons_frame, text="Load Config", command=load_json_config).pack(
+    side="left", padx=10
+)
+tk.Button(buttons_frame, text="Save Config", command=save_json_config).pack(
+    side="left", padx=10
+)
 status_var = tk.StringVar(value="Ready...")
-status_label = tk.Label(root, textvariable=status_var, fg="cyan", font=("Helvetica", 16, "bold"))
+status_label = tk.Label(
+    root, textvariable=status_var, fg="cyan", font=("Helvetica", 16, "bold")
+)
 status_label.pack(pady=5)
 
 

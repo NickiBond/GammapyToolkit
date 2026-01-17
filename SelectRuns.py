@@ -8,14 +8,14 @@ def SelectRuns(path_to_log, args):
     # Capture stdout into a string buffer
     buf = io.StringIO()
     with redirect_stdout(buf):
-        data_store.info()   
+        data_store.info()
     # Write the captured output to the log file
     f.write(buf.getvalue())
     f.write(str(data_store.hdu_table))
     f.write("\n--------------------------------------------------\n")
     f.write("Data Selection:\n")
     obs_table = data_store.obs_table
-    obs_table.sort('OBS_ID')
+    obs_table.sort("OBS_ID")
     target_position = SkyCoord.from_name(args.ObjectName).icrs
     f.write(f"Target Position: {target_position.to_string('hmsdms')} \n")
     f.write(f"Target Position: {target_position} \n")
@@ -68,9 +68,11 @@ def SelectRuns(path_to_log, args):
             + str(len(obs_table))
             + "\n"
         )
-    
+
     if len(obs_table) == 0:
-        raise ValueError("No observations selected. Please check your selection criteria.")
+        raise ValueError(
+            "No observations selected. Please check your selection criteria."
+        )
 
     #  Only accept runs after a certain date
     if args.FromDate != None:
@@ -85,8 +87,10 @@ def SelectRuns(path_to_log, args):
             + "\n"
         )
     if len(obs_table) == 0:
-        raise ValueError("No observations selected. Please check your selection criteria.")
-    
+        raise ValueError(
+            "No observations selected. Please check your selection criteria."
+        )
+
     #  Only accept runs before a certain date
     if args.ToDate != None:
         ToDate = Time(args.ToDate).mjd
@@ -101,7 +105,8 @@ def SelectRuns(path_to_log, args):
         )
 
     observations = data_store.get_observations(
-        obs_table["OBS_ID"], required_irf="point-like"  #includes ["events", "gti", "aeff", "edisp"]
+        obs_table["OBS_ID"],
+        required_irf="point-like",  # includes ["events", "gti", "aeff", "edisp"]
     )
     obs_ids = observations.ids
     f.write("--------------------------------------------------\n")
@@ -109,5 +114,7 @@ def SelectRuns(path_to_log, args):
     f.write("--------------------------------------------------\n")
     f.close()
     if len(obs_table) == 0:
-        raise ValueError("No observations selected. Please check your selection criteria.")
+        raise ValueError(
+            "No observations selected. Please check your selection criteria."
+        )
     return obs_table, observations, target_position, obs_ids

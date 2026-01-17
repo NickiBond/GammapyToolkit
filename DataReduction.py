@@ -1,8 +1,24 @@
 from importer import *
 from GetGeometry import GetOnRegionRadius
-def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, observations, obs_ids, path_to_log, args, on_region_radius, tmin=None, tmax=None):
+
+
+def RunDataReductionChain(
+    geom,
+    energy_axis,
+    energy_axis_true,
+    exclusion_mask,
+    observations,
+    obs_ids,
+    path_to_log,
+    args,
+    on_region_radius,
+    tmin=None,
+    tmax=None,
+):
     if tmin is not None and tmax is not None:
-        WorkingDir = os.path.join(args.ADir, f"SpectralVariability/TimeBin_{tmin}_{tmax}")
+        WorkingDir = os.path.join(
+            args.ADir, f"SpectralVariability/TimeBin_{tmin}_{tmax}"
+        )
         os.makedirs(WorkingDir, exist_ok=True)
     else:
         WorkingDir = args.ADir
@@ -10,16 +26,21 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
             os.makedirs(WorkingDir + "/LightCurve", exist_ok=True)
     os.makedirs(WorkingDir + "/Diagnostics", exist_ok=True)
     os.makedirs(WorkingDir + "/Spectrum", exist_ok=True)
-    
-    dataset_maker = SpectrumDatasetMaker(
-    selection=["counts", "exposure", "edisp"]
-    )
+
+    dataset_maker = SpectrumDatasetMaker(selection=["counts", "exposure", "edisp"])
     dataset_empty = SpectrumDataset.create(geom=geom, energy_axis_true=energy_axis_true)
     if args.BackgroundMaker == "ReflectedRegions":
         bkg_maker = ReflectedRegionsBackgroundMaker(exclusion_mask=exclusion_mask)
     else:
-        raise ValueError(f"Unknown Background Maker: {args.BackgroundMaker}. Choose 'ReflectedRegions'.")
-    safe_mask_maker = SafeMaskMaker(methods=["offset-max", "aeff-max", "edisp-bias"], offset_max=1.75 * u.deg, aeff_percent=5, bias_percent=5)
+        raise ValueError(
+            f"Unknown Background Maker: {args.BackgroundMaker}. Choose 'ReflectedRegions'."
+        )
+    safe_mask_maker = SafeMaskMaker(
+        methods=["offset-max", "aeff-max", "edisp-bias"],
+        offset_max=1.75 * u.deg,
+        aeff_percent=5,
+        bias_percent=5,
+    )
     """
     datasets_not_safe = Datasets()
     datasets = Datasets()
@@ -41,7 +62,9 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         dataset_on_off = bkg_maker.run(dataset, observation)
         datasets.append(dataset_on_off)
     # Significance Calculation
-    CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=False)
+    CalculateAndPlotSignificanceAndExcess(
+        datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=False
+    )
     datasets = Datasets()
     for obs_id, observation in zip(obs_ids, observations):
         dataset = dataset_maker.run(dataset_empty.copy(name=str(obs_id)), observation)
@@ -49,19 +72,25 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
         dataset_on_off = safe_mask_maker.run(dataset_on_off, observation)
         datasets.append(dataset_on_off)
     # Significance Calculation
-    CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=True)
+    CalculateAndPlotSignificanceAndExcess(
+        datasets, path_to_log, WorkingDir, args, tmin=tmin, tmax=tmax, safe=True
+    )
 
     plt.figure()
     # Plot on and off regions
     ax = exclusion_mask.plot()
-    on_region_radius=GetOnRegionRadius(args, path_to_log)
-    on_region = CircleSkyRegion(center=SkyCoord.from_name(args.ObjectName).icrs, radius=on_region_radius)
+    on_region_radius = GetOnRegionRadius(args, path_to_log)
+    on_region = CircleSkyRegion(
+        center=SkyCoord.from_name(args.ObjectName).icrs, radius=on_region_radius
+    )
     on_region.to_pixel(ax.wcs).plot(ax=ax, color="lime")
     plot_spectrum_datasets_off_regions(ax=ax, datasets=datasets)
     plt.legend(["ON region"])
     if tmin != None and tmax != None:
         plt.title(f"Exclusion Regions from {tmin} to {tmax}")
-        plt.savefig(WorkingDir+ f"/Diagnostics/OnOffExclusionRegionsFrom{tmin}To{tmax}.pdf")
+        plt.savefig(
+            WorkingDir + f"/Diagnostics/OnOffExclusionRegionsFrom{tmin}To{tmax}.pdf"
+        )
     else:
         plt.title("Exclusion Regions")
         plt.savefig(WorkingDir + "/Diagnostics/OnOffExclusionRegions.pdf")
@@ -78,7 +107,9 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
             f.write(f"  Compound Model: {spectral_model.__class__.__name__}\n")
             f.write(f"  Operator: {spectral_model.operator.__name__}\n")
 
-            for i, component in enumerate([spectral_model.model1, spectral_model.model2], start=1):
+            for i, component in enumerate(
+                [spectral_model.model1, spectral_model.model2], start=1
+            ):
                 f.write(f"  Component {i} ({component.__class__.__name__}):\n")
                 for par in component.parameters:
                     f.write(f"    {par.name} = {par.value} {par.unit}\n")
@@ -107,55 +138,65 @@ def RunDataReductionChain(geom, energy_axis, energy_axis_true, exclusion_mask, o
             ax_spectrum.set_ylim(0.1, 40)
             plt.savefig(predicted_counts_dir + f"/SpectrumFit_{dataset.name}.pdf")
             with open(path_to_log, "a") as f:
-                f.write(f"Saved Spectrum Fit for Obs ID {dataset.name} to {predicted_counts_dir}/SpectrumFit_{dataset.name}.pdf\n")
+                f.write(
+                    f"Saved Spectrum Fit for Obs ID {dataset.name} to {predicted_counts_dir}/SpectrumFit_{dataset.name}.pdf\n"
+                )
             plt.close()
     # Next calculate flux points by fitting the fit_result model's amplitude in each energy bin
-    fpe  = FluxPointsEstimator(
-        energy_edges = energy_axis.edges,
-        source = str(args.ObjectName),
-        selection_optional = "all",
-        )
-    # The lines below are due to a bug in gammapy to do with how it fits non-detection points. This is a workaround for now. 
-    fpe.norm_min=-1e2,
-    fpe.norm_max=1e2,
-    fpe.norm.scan_values=np.array(np.linspace(-10,10,10))
-    flux_points=fpe.run(datasets=datasets)
+    fpe = FluxPointsEstimator(
+        energy_edges=energy_axis.edges,
+        source=str(args.ObjectName),
+        selection_optional="all",
+    )
+    # The lines below are due to a bug in gammapy to do with how it fits non-detection points. This is a workaround for now.
+    fpe.norm_min = (-1e2,)
+    fpe.norm_max = (1e2,)
+    fpe.norm.scan_values = np.array(np.linspace(-10, 10, 10))
+    flux_points = fpe.run(datasets=datasets)
     flux_points.to_table().write(
-            os.path.join(WorkingDir, "Spectrum/SED.ecsv"), overwrite=True
-        )
-    
+        os.path.join(WorkingDir, "Spectrum/SED.ecsv"), overwrite=True
+    )
+
     # Plot the flux points and best fit spectral model
-    flux_points_dataset = FluxPointsDataset(
-        data=flux_points, 
-        models=datasets.models)
+    flux_points_dataset = FluxPointsDataset(data=flux_points, models=datasets.models)
     plot_success = safe_plot_fit(flux_points_dataset, WorkingDir=WorkingDir)
     if plot_success:
         with open(path_to_log, "a") as f:
             f.write("Plot generated successfully.\n")
-            f.write(f"Saved SED plot to {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf\n")
+            f.write(
+                f"Saved SED plot to {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf\n"
+            )
     else:
         with open(path_to_log, "a") as f:
-            f.write(f"Failed to generate plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. Continuing...\n")
+            f.write(
+                f"Failed to generate plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. Continuing...\n"
+            )
     return fit_result, datasets
 
-def safe_plot_fit(flux_points_dataset, WorkingDir):
-        """Safely attempt to plot fit results, continuing on failure."""
-        try:
-            flux_points_dataset.plot_fit()
-            plt.savefig(os.path.join(WorkingDir, "Spectrum/Spectrum_FluxPoints.pdf"))
-            return True
-        except ValueError as e:
-            if "Axis limits cannot be NaN or Inf" in str(e):
-                print(f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - data contains NaN/Inf values")
-            else:
-                print(f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - ValueError: {e}")
-            return False
-        except Exception as e:
-            print(f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - Unexpected error: {e}")
-            return False
-        
 
-    
+def safe_plot_fit(flux_points_dataset, WorkingDir):
+    """Safely attempt to plot fit results, continuing on failure."""
+    try:
+        flux_points_dataset.plot_fit()
+        plt.savefig(os.path.join(WorkingDir, "Spectrum/Spectrum_FluxPoints.pdf"))
+        return True
+    except ValueError as e:
+        if "Axis limits cannot be NaN or Inf" in str(e):
+            print(
+                f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - data contains NaN/Inf values"
+            )
+        else:
+            print(
+                f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - ValueError: {e}"
+            )
+        return False
+    except Exception as e:
+        print(
+            f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - Unexpected error: {e}"
+        )
+        return False
+
+
 def BuildModel(args):
     models = {}
     if "PowerLaw" in args.SpectralModel:
@@ -191,27 +232,26 @@ def BuildModel(args):
             index2=args.SmoothBrokenPowerLawIndex2,
             amplitude=args.SmoothBrokenPowerLawAmplitude * u.Unit("cm-2 s-1 TeV-1"),
             reference=args.SmoothBrokenPowerLawReferenceEnergy * u.Unit("TeV"),
-            ebreak= args.SmoothBrokenPowerLawEnergyBreak * u.Unit("TeV"),
+            ebreak=args.SmoothBrokenPowerLawEnergyBreak * u.Unit("TeV"),
             beta=args.SmoothBrokenPowerLawBeta,
         )
-    parts = re.split(r'([+])', args.SpectralModel)
+    parts = re.split(r"([+])", args.SpectralModel)
     if len(parts) == 1:
         return models[parts[0]]
     elif len(parts) == 3:
         model1, operation, model2 = parts
         if operation == "+":
-            return CompoundSpectralModel(
-                models[model1],
-                models[model2],
-                operator.add
-            )
+            return CompoundSpectralModel(models[model1], models[model2], operator.add)
         if operation not in ["+"]:
             raise ValueError(f"Unsupported operator: {operation}")
     else:
         raise ValueError("Only binary compound models are supported.")
 
-def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, args, tmin=None, tmax=None, safe = True):
-    info_table = datasets.info_table(cumulative = True)
+
+def CalculateAndPlotSignificanceAndExcess(
+    datasets, path_to_log, WorkingDir, args, tmin=None, tmax=None, safe=True
+):
+    info_table = datasets.info_table(cumulative=True)
     with open(path_to_log, "a") as f:
         if tmin is None and tmax is None:
             f.write("Significance and Excess for all observations")
@@ -251,10 +291,14 @@ def CalculateAndPlotSignificanceAndExcess(datasets, path_to_log, WorkingDir, arg
     with open(path_to_log, "a") as f:
         if safe:
             plt.savefig(WorkingDir + "/Spectrum/SignificanceAndExcess_Safe.pdf")
-            f.write(f"Saving Figure to {WorkingDir}/Spectrum/SignificanceAndExcess_Safe.pdf\n")
+            f.write(
+                f"Saving Figure to {WorkingDir}/Spectrum/SignificanceAndExcess_Safe.pdf\n"
+            )
         else:
             plt.savefig(WorkingDir + "/Spectrum/SignificanceAndExcess_NotSafe.pdf")
-            f.write(f"Saving Figure to {WorkingDir}/Spectrum/SignificanceAndExcess_NotSafe.pdf\n")
+            f.write(
+                f"Saving Figure to {WorkingDir}/Spectrum/SignificanceAndExcess_NotSafe.pdf\n"
+            )
         f.write("--------------------------------------------------\n")
     plt.close()
     return
