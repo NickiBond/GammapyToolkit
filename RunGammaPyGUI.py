@@ -100,17 +100,26 @@ class CreateToolTip:
         if tw:
             tw.destroy()
 
-
-# --- Browsing logic ---
+# Browse for file / folder
 def browse_folder(entry):
-    path = filedialog.askdirectory()
+    current_path = entry.get()
+    if os.path.isdir(current_path):
+        initial_dir = current_path
+    else:
+        initial_dir = os.getcwd()   
+    path = filedialog.askdirectory(initialdir=initial_dir, title="Select a folder")
     if path:
         entry.delete(0, tk.END)
         entry.insert(0, path)
 
 
 def browse_file(entry):
-    path = filedialog.askopenfilename()
+    current_path = entry.get()
+    if os.path.isdir(current_path):
+        initial_dir = current_path
+    else:
+        initial_dir = os.getcwd()   
+    path = filedialog.askopenfilename(initialdir=initial_dir, title="Select a file")
     if path:
         entry.delete(0, tk.END)
         entry.insert(0, path)
