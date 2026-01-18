@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 import tkinter.messagebox
 import subprocess
-from PIL import Image, ImageTk
 import json
 import os
 import threading
@@ -35,6 +34,7 @@ help_dict = {
     "LightCurveComparisonULs": "CSV file with upper limits for comparison.",
     "LightCurveStartTime": "Start time for first bin of light curve. Accepts multiple unit options e.g. mjd:59000, jd:2459000.5, unix:1640995200, or ISO (2022-01-01). Only used if -LightCurveBinDuration is also provided",
     "IncludeNearby": "Include observations of sources within 5 deg of ObjectName in the analysis. default= False",
+    "SEDPower": "Select power of energy (p) multiply dN/dE with when plotting spectrum. (E^p dN/dE)",
     "SpectralModel": "Spectral model or expression of 2 models (e.g., PowerLaw, PowerLawCutOff, BrokenPowerLaw, LogParabola, SmoothBrokenPowerLaw, PowerLaw+ExpCutoff, PowerLaw+LogParabola) \n e.g. PowerLaw+ExpCutoff or PowerLaw+LogParabola and quotes around the expression. \n Default is PowerLaw.",
     "PowerLawIndex": "Spectral index for PowerLaw.",
     "PowerLawAmplitude": "Amplitude in cm^-2 s^-1 TeV^-1 for PowerLaw.",
@@ -100,13 +100,14 @@ class CreateToolTip:
         if tw:
             tw.destroy()
 
+
 # Browse for file / folder
 def browse_folder(entry):
     current_path = entry.get()
     if os.path.isdir(current_path):
         initial_dir = current_path
     else:
-        initial_dir = os.getcwd()   
+        initial_dir = os.getcwd()
     path = filedialog.askdirectory(initialdir=initial_dir, title="Select a folder")
     if path:
         entry.delete(0, tk.END)
@@ -118,7 +119,7 @@ def browse_file(entry):
     if os.path.isdir(current_path):
         initial_dir = current_path
     else:
-        initial_dir = os.getcwd()   
+        initial_dir = os.getcwd()
     path = filedialog.askopenfilename(initialdir=initial_dir, title="Select a file")
     if path:
         entry.delete(0, tk.END)
@@ -391,6 +392,7 @@ add_entry(
     browse=True,
     row=2,
 )
+add_entry(f, "Energy power for flux axis", "SEDPower", "0", row=3)
 
 # --- Light Curve tab ---
 f = frames["Light Curve"]

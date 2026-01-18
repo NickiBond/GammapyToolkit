@@ -111,6 +111,12 @@ def get_parser():
         help="Spectral model or expression of 2 models (e.g., PowerLaw, PowerLawCutOff, BrokenPowerLaw, LogParabola, SmoothBrokenPowerLaw, PowerLaw+ExpCutoff, PowerLaw+LogParabola) \n e.g. PowerLaw+ExpCutoff or PowerLaw+LogParabola and quotes around the expression. \n Default is PowerLaw.",
     )
 
+    parser.add_argument(
+        "-SEDPower",
+        default=0,
+        help="Select power of energy (p) multiply dN/dE with when plotting spectrum. (E^p dN/dE)",
+    )
+
     # --- PowerLaw group ---
     pl_group = parser.add_argument_group("PowerLaw Spectral Model")
     pl_group.add_argument(

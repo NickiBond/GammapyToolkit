@@ -162,7 +162,7 @@ def RunDataReductionChain(
 
     # Plot the flux points and best fit spectral model
     flux_points_dataset = FluxPointsDataset(data=flux_points, models=datasets.models)
-    plot_success = safe_plot_fit(flux_points_dataset, WorkingDir=WorkingDir)
+    plot_success = safe_plot_fit(flux_points_dataset, WorkingDir=WorkingDir, args=args)
     if plot_success:
         with open(path_to_log, "a") as f:
             f.write("Plot generated successfully.\n")
@@ -177,30 +177,92 @@ def RunDataReductionChain(
     return fit_result, datasets
 
 
-def safe_plot_fit(flux_points_dataset, WorkingDir):
-    """Safely attempt to plot fit results, continuing on failure."""
+def safe_plot_fit(flux_points_dataset, WorkingDir, args):
+    # Safely plot flux points and best-fit model as E^args.SEDPower dN/dE,
     try:
-        flux_points_dataset.plot_fit()
-        plt.savefig(os.path.join(WorkingDir, "Spectrum/Spectrum_FluxPoints.pdf"))
+        p = float(args.SEDPower)
+        table = flux_points_dataset.data.to_table(sed_type="dnde")
+        E = table["e_ref"]
+        dnde = table["dnde"]
+        # Handle asymmetric errors (incl. asymmetric)
+        if "dnde_err" in table.colnames:
+            yerr = (E**p) * table["dnde_err"]
+        elif "dnde_errn" in table.colnames and "dnde_errp" in table.colnames:
+            yerr = (
+                (E**p) * table["dnde_errn"],
+                (E**p) * table["dnde_errp"],
+            )
+        else:
+            yerr = None
+        y = (E**p) * dnde
+
+        plt.figure()
+        plt.errorbar(
+            E,
+            y,
+            yerr=yerr,
+            fmt="o",
+            capsize=2,
+            label="Flux points",
+        )
+
+        # Plot best-fit spectral model
+        model = flux_points_dataset.models[0].spectral_model
+
+        E = u.Quantity(E)
+
+        emin = np.min(E)
+        emax = np.max(E)
+
+        energy = (
+            np.logspace(
+                np.log10(emin.to_value(E.unit)),
+                np.log10(emax.to_value(E.unit)),
+                200,
+            )
+            * E.unit
+        )
+
+        dnde_model = model(energy)
+        y_model = (energy**p) * dnde_model
+
+        plt.plot(energy, y_model, label="Best-fit model")
+        plt.xscale("log")
+        plt.yscale("log")
+        plt.xlabel(f"Energy [{E.unit}]")
+        plt.ylabel(rf"$E^{{{p}}}\,\mathrm{{dN/dE}}$")
+        plt.legend()
+
+        outpath = os.path.join(
+            WorkingDir,
+            "Spectrum",
+            f"Spectrum_FluxPoints_E{p}.pdf",
+        )
+        plt.savefig(outpath)
+        plt.close()
+
         return True
+
     except ValueError as e:
         if "Axis limits cannot be NaN or Inf" in str(e):
             print(
-                f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - data contains NaN/Inf values"
+                f"Warning: Cannot make plot {WorkingDir}/Spectrum/. - data contains NaN/Inf values"
             )
         else:
             print(
-                f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - ValueError: {e}"
+                f"Warning: Cannot make plot {WorkingDir}/Spectrum/. - ValueError: {e}"
             )
         return False
+
     except Exception as e:
         print(
-            f"Warning: Cannot make plot {WorkingDir}/Spectrum/Spectrum_FluxPoints.pdf. - Unexpected error: {e}"
+            f"Warning: Cannot make plot {WorkingDir}/Spectrum/. - Unexpected error: {e}"
         )
         return False
 
 
 def BuildModel(args):
+    # I think these are always with dN/dE on flux axis
     models = {}
     if "PowerLaw" in args.SpectralModel:
         models["PowerLaw"] = PowerLawSpectralModel(
