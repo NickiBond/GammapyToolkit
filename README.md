@@ -1,4 +1,4 @@
-<img src="ChatGPTGammaPyScriptLogo.png" alt="Project Logo" width="500">
+<img src="ChatGPTGammaPyToolkitBanner.png" alt="Project Logo" width="500">
 
 # Introduction
 This Toolkit is used to run gammapy using VERITAS data.
