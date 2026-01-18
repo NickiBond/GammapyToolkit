@@ -23,11 +23,11 @@ To Run:
 ########### Import Libraries ###########
 ######### Get Initial Arguments ########
 import time
-
 script_start_time = time.time()
+import os
 import sys
-
-sys.path.append("/Users/nickibond/Documents/Research/Toolkit")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(script_dir)
 from importer import *
 from AddArguments import get_parser, CheckAllowedSpectralModelInputted
 from WriteLogFile import (
