@@ -58,7 +58,7 @@ help_dict = {
     "SmoothBrokenPowerLawAmplitude": "Amplitude in cm^-2 s^-1 TeV^-1 for SmoothBrokenPowerLaw.",
     "SmoothBrokenPowerLawReferenceEnergy": "Reference energy for SmoothBrokenPowerLaw.",
     "SmoothBrokenPowerLawBeta": "Beta parameter for SmoothBrokenPowerLaw.",
-    "exclusion_csv": "Path to a CSV file containing user-defined exclusion regions. The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
+    "exclusion_csv": "Path to a CSV file containing user-defined exclusion regions. The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit), name (optional). No header is required.",
     "NameSourceInOnOffRegionPlot": "Do you want the ObjectName to be printed on the On, Off, Exclusion regions plot?",
 }
 

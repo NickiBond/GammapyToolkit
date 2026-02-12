@@ -339,7 +339,7 @@ def get_parser():
     parser.add_argument(
         "-exclusion_csv",
         help="Path to a CSV file containing user-defined exclusion regions."
-        " The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
+        "Path to a CSV file containing user-defined exclusion regions. The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit), name (optional). No header is required.",
         type=str,
         required=False,
         default=None,
