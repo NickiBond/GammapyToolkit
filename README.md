@@ -8,6 +8,8 @@ This Toolkit is used to run gammapy using VERITAS data.
     -  the GUI: "RunGammaPyGUI.py".
 
 # Required packages
+The complete list of [required packages](EnvironmentPackages.txt) is quite extensive, but most of these are dependencies of each other.
+A more minimal list (in which all dependencies are included) is given here.
 - numpy 2.4.1
 - pandas 2.3.3
 - scipy 1.17
