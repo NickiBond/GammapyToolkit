@@ -6,7 +6,7 @@ import json
 import os
 import threading
 
-# --- Help messages ---
+# Help message dictionary
 help_dict = {
     "VEGASLogFile": "Path to VEGAS Stage 6 log file. Provide if you want spectral comparison.",
     "ObjectName": "Only accept runs with this object name. Also used to determine source co-ordinates.",
@@ -59,6 +59,7 @@ help_dict = {
     "SmoothBrokenPowerLawReferenceEnergy": "Reference energy for SmoothBrokenPowerLaw.",
     "SmoothBrokenPowerLawBeta": "Beta parameter for SmoothBrokenPowerLaw.",
     "exclusion_csv": "Path to a CSV file containing user-defined exclusion regions. The CSV should have columns: ra (deg), dec (deg), radius (deg or with astropy unit).",
+    "NameSourceInOnOffRegionPlot": "Do you want the ObjectName to be printed on the On, Off, Exclusion regions plot?",
 }
 
 
@@ -238,6 +239,12 @@ def run_script():
             saved_data["BackgroundMaker"] = background_maker_var.get()
             args += ["-BackgroundMaker", background_maker_var.get()]
 
+            saved_data["NameSourceInOnOffRegionPlot"] = (
+                NameSourceInOnOffRegionPlot_var.get()
+            )
+            if NameSourceInOnOffRegionPlot_var.get():
+                args += ["-NameSourceInOnOffRegionPlot"]
+
             # Spectral parameters for compound models
             # Flatten spectral_entries dict: keys are compound keys like 'PowerLaw_Index', 'LogParabola_Alpha', etc.
             for key, (label, entry) in spectral_entries.items():
@@ -374,6 +381,13 @@ label.grid(row=10, column=0, sticky="e", padx=5, pady=2)
 tk.Checkbutton(f, variable=debug_mode_var).grid(row=10, column=1, sticky="w", pady=2)
 CreateToolTip(label, help_dict["Debug"])
 add_entry(f, "User exclusion regions", "exclusion_csv", "", browse=True, row=11)
+NameSourceInOnOffRegionPlot_var = tk.BooleanVar(value=False)
+label = tk.Label(f, text="Label On Region Object?")
+label.grid(row=12, column=0, sticky="e", padx=5, pady=2)
+tk.Checkbutton(f, variable=NameSourceInOnOffRegionPlot_var).grid(
+    row=12, column=1, sticky="w", pady=2
+)
+CreateToolTip(label, help_dict["NameSourceInOnOffRegionPlot"])
 # --- Energy Axis tab ---
 f = frames["Energy Axis"]
 add_entry(f, "Energy Axis Min (TeV)", "EnergyAxisMin", "0.1", row=0)

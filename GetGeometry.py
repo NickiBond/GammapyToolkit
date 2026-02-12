@@ -62,8 +62,12 @@ def GetExclusionRegions(target_position, args, path_to_log):
         f.write(" - A 0.1 degree exclusion region is used for the stars\n")
         f.write(" - A 0.3 degree exclusion region is used for the target\n")
         f.write("\n Bright Stars That Are Excluded: \n")
-        StarTable = Table(names=("RA(ICRS)", "DE(ICRS)", "BTmag"))
-        for row in result[0][["RA(ICRS)", "DE(ICRS)", "BTmag"]]:
+        StarTable = Table(
+            names=("RA(ICRS)", "DE(ICRS)", "BTmag", "TYC1", "TYC2", "TYC3", "HIP")
+        )
+        for row in result[0][
+            ["RA(ICRS)", "DE(ICRS)", "BTmag", "TYC1", "TYC2", "TYC3", "HIP"]
+        ]:
             if row["BTmag"] < 6:
                 StarTable.add_row(row)
                 f.write(str(row) + "\n")
@@ -99,7 +103,7 @@ def GetExclusionRegions(target_position, args, path_to_log):
 
     # User supplies exclusion regions.
     if args.exclusion_csv is not None:
-        user_regions = read_exclusion_csv(args.exclusion_csv)
+        user_regions, _ = read_exclusion_csv(args.exclusion_csv)
         exclusion_regions.extend(user_regions)
 
         with open(path_to_log, "a") as f:
@@ -134,11 +138,12 @@ def read_exclusion_csv(csv_path):
       - ra  (deg, ICRS)
       - dec (deg, ICRS)
       - radius (deg by default, or astropy unit string)
+      - name (if region is to be labelled in On/Off/Exclusion regions plot, or nothing if not)
     """
     table = Table.read(
         csv_path,
         format="csv",
-        names=("ra", "dec", "radius"),
+        names=("ra", "dec", "radius", "name"),
     )
     regions = []
 
@@ -162,4 +167,4 @@ def read_exclusion_csv(csv_path):
 
         regions.append(CircleSkyRegion(center=coord, radius=radius))
 
-    return regions
+    return regions, table

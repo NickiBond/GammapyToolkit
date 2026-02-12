@@ -81,6 +81,12 @@ def get_parser():
         required=False,
         default="ReflectedRegions",
     )
+    parser.add_argument(
+        "-NameSourceInOnOffRegionPlot",
+        help="Do you want the ObjectName to be printed on the On, Off, Exclusion regions plot?",
+        required=False,
+        action="store_true",
+    )
 
     # Energy Axis Parameters
     parser.add_argument(

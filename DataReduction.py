@@ -1,5 +1,6 @@
 from importer import *
 from GetGeometry import GetOnRegionRadius
+from GetGeometry import read_exclusion_csv
 
 
 def RunDataReductionChain(
@@ -80,13 +81,40 @@ def RunDataReductionChain(
     # Plot on and off regions
     ax = exclusion_mask.plot()
     on_region_radius = GetOnRegionRadius(args, path_to_log)
-    on_region = CircleSkyRegion(
-        center=SkyCoord.from_name(args.ObjectName).icrs, radius=on_region_radius
-    )
+    obj_coord = SkyCoord.from_name(args.ObjectName).icrs
+    on_region = CircleSkyRegion(center=obj_coord, radius=on_region_radius)
+
     on_region.to_pixel(ax.wcs).plot(ax=ax, color="lime")
+    if args.NameSourceInOnOffRegionPlot:
+        obj_x, obj_y = obj_coord.to_pixel(ax.wcs)
+        ax.annotate(
+            args.ObjectName,
+            xy=(obj_x, obj_y),
+            xycoords="data",
+            xytext=(12, 0),
+            textcoords="offset points",
+            color="red",
+            fontsize=12,
+        )
     plot_spectrum_datasets_off_regions(ax=ax, datasets=datasets)
-    plt.legend(["ON region"])
-    if tmin != None and tmax != None:
+    plt.legend(["On Region"])
+    if args.exclusion_csv is not None:
+        _, table = read_exclusion_csv(args.exclusion_csv)
+        for row in table:
+            coord = SkyCoord(row["ra"], row["dec"], unit="deg", frame="icrs")
+            x, y = coord.to_pixel(ax.wcs)
+            if row["name"]:
+                ax.annotate(
+                    row["name"],
+                    xy=(x, y),
+                    xycoords="data",
+                    xytext=(10, 10),
+                    textcoords="offset points",
+                    color="red",
+                    fontsize=12,
+                )
+
+    if tmin is not None and tmax is not None:
         plt.title(f"Exclusion Regions from {tmin} to {tmax}")
         plt.savefig(
             WorkingDir + f"/Diagnostics/OnOffExclusionRegionsFrom{tmin}To{tmax}.pdf"
@@ -119,32 +147,18 @@ def RunDataReductionChain(
                 f.write(f"    {par.name} = {par.value} {par.unit}\n")
                 f.write("--------------------------------------------------\n")
     datasets.models = [model]
-    fit_joint = Fit()
-    fit_result = fit_joint.run(datasets=datasets)
+    fit = Fit()
+    fit_result = fit.run(datasets=datasets)
     with open(path_to_log, "a") as f:
         if tmin is not None and tmax is not None:
             f.write(f"Results for time bin {tmin} to {tmax}\n")
         if fit_result.success != True:
             f.write("WARNING: ERROR IN OPTIMISATION")
+            print("WARNING: ERROR IN OPTIMISATION")
             f.write(str(fit_result))
         f.write("Fit Results:\n" + str(fit_result.models) + "\n")
         f.write("--------------------------------------------------\n")
-    # Plot the fit
-    predicted_counts_dir = os.path.join(WorkingDir, "Diagnostics", "PredictedCounts")
-    os.makedirs(predicted_counts_dir, exist_ok=True)
-    for i, dataset in enumerate(datasets):
-        if args.Debug or i < 10:
-            with warnings.catch_warnings():
-                # Removes plotting warnings due to log / negative values
-                warnings.simplefilter("ignore", category=UserWarning)
-                ax_spectrum, ax_residuals = dataset.plot_fit()
-            ax_spectrum.set_yscale("linear")
-            plt.savefig(predicted_counts_dir + f"/SpectrumFit_{dataset.name}.pdf")
-            with open(path_to_log, "a") as f:
-                f.write(
-                    f"Saved Spectrum Fit for Obs ID {dataset.name} to {predicted_counts_dir}/SpectrumFit_{dataset.name}.pdf\n"
-                )
-            plt.close()
+
     # Next calculate flux points by fitting the fit_result model's amplitude in each energy bin
     fpe = FluxPointsEstimator(
         energy_edges=energy_axis.edges,
@@ -178,91 +192,56 @@ def RunDataReductionChain(
 
 
 def safe_plot_fit(flux_points_dataset, WorkingDir, args):
-    # Safely plot flux points and best-fit model as E^args.SEDPower dN/dE,
-    try:
-        p = float(args.SEDPower)
-        table = flux_points_dataset.data.to_table(sed_type="dnde")
-        E = table["e_ref"]
-        dnde = table["dnde"]
-        # Handle asymmetric errors (incl. asymmetric)
-        if "dnde_err" in table.colnames:
-            yerr = (E**p) * table["dnde_err"]
-        elif "dnde_errn" in table.colnames and "dnde_errp" in table.colnames:
-            yerr = (
-                (E**p) * table["dnde_errn"],
-                (E**p) * table["dnde_errp"],
-            )
-        else:
-            yerr = None
-        y = (E**p) * dnde
+    fig, (ax1, ax2) = plt.subplots(
+        2,
+        1,
+        sharex=True,
+        gridspec_kw={"height_ratios": [10, 4]},
+        figsize=(8, 8),
+        tight_layout=True,
+    )
+    flux_points_dataset.plot_fit(
+        ax_spectrum=ax1,
+        ax_residuals=ax2,
+        kwargs_spectrum={
+            "kwargs_fp": {
+                "sed_type": "dnde",
+                "label": "Flux points",
+                "color": "red",
+                "capsize": 3,
+            },
+            "kwargs_model": {
+                "sed_type": "dnde",
+                "label": f"{GetSpectralModelName(flux_points_dataset.models)}",
+                "color": "red",
+            },
+        },
+        kwargs_residuals={"label": "Residuals", "color": "red", "marker": "."},
+    )
+    for collection in ax1.collections:  # Change background region to orange
+        if isinstance(collection, PolyCollection):
+            collection.set_facecolor("red")
+            collection.set_alpha(0.3)
+            collection.set_label("VEGAS-> Gammapy Power Law Error")
+    ax1.legend(fontsize=9)
+    ax2.legend(loc="lower right", fontsize=9)
+    ax2.axhline(0, color="black")
+    ax1.set_xlabel(xlabel="", fontsize=11)
+    label_resid = r"Residuals: $\frac{\mathrm{data}-\mathrm{model}}{\mathrm{model}}$"
+    ax2.set_ylabel(label_resid, fontsize=16)
 
-        plt.figure()
-        plt.errorbar(
-            E,
-            y,
-            yerr=yerr,
-            fmt="o",
-            capsize=2,
-            label="Flux points",
-        )
-
-        # Plot best-fit spectral model
-        model = flux_points_dataset.models[0].spectral_model
-
-        E = u.Quantity(E)
-
-        emin = np.min(E)
-        emax = np.max(E)
-
-        energy = (
-            np.logspace(
-                np.log10(emin.to_value(E.unit)),
-                np.log10(emax.to_value(E.unit)),
-                200,
-            )
-            * E.unit
-        )
-
-        dnde_model = model(energy)
-        y_model = (energy**p) * dnde_model
-
-        plt.plot(energy, y_model, label="Best-fit model")
-        plt.xscale("log")
-        plt.yscale("log")
-        plt.xlabel(f"Energy [{E.unit}]")
-        plt.ylabel(rf"$E^{{{p}}}\,\mathrm{{dN/dE}}$")
-        plt.legend()
-
-        outpath = os.path.join(
-            WorkingDir,
-            "Spectrum",
-            f"Spectrum_FluxPoints_E{p}.pdf",
-        )
-        plt.savefig(outpath)
-        plt.close()
-
-        return True
-
-    except ValueError as e:
-        if "Axis limits cannot be NaN or Inf" in str(e):
-            print(
-                f"Warning: Cannot make plot {WorkingDir}/Spectrum/. - data contains NaN/Inf values"
-            )
-        else:
-            print(
-                f"Warning: Cannot make plot {WorkingDir}/Spectrum/. - ValueError: {e}"
-            )
-        return False
-
-    except Exception as e:
-        print(
-            f"Warning: Cannot make plot {WorkingDir}/Spectrum/. - Unexpected error: {e}"
-        )
-        return False
+    fig.tight_layout()
+    outpath = os.path.join(
+        WorkingDir,
+        "Spectrum",
+        f"Spectrum_FluxPoints.pdf",
+    )
+    fig.savefig(outpath)
+    return True
 
 
 def BuildModel(args):
-    # I think these are always with dN/dE on flux axis
+    # These are always with dN/dE on flux axis
     models = {}
     if "PowerLaw" in args.SpectralModel:
         models["PowerLaw"] = PowerLawSpectralModel(
@@ -367,3 +346,21 @@ def CalculateAndPlotSignificanceAndExcess(
         f.write("--------------------------------------------------\n")
     plt.close()
     return
+
+
+def GetSpectralModelName(model):
+    if isinstance(model, CompoundSpectralModel):
+        left = GetSpectralModelName(model.model1)
+        right = GetSpectralModelName(model.model2)
+
+        op = model.operator
+        if op is operator.add:
+            symbol = "+"
+        elif op is operator.mul:
+            symbol = "*"
+        else:
+            symbol = op.__name__
+
+        return f"{left} {symbol} {right}"
+
+    return model.__class__.__name__.replace("SpectralModel", "")
