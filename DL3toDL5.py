@@ -23,9 +23,11 @@ To Run:
 ########### Import Libraries ###########
 ######### Get Initial Arguments ########
 import time
+
 script_start_time = time.time()
 import os
 import sys
+
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_dir)
 from importer import *
