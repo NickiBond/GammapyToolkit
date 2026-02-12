@@ -1,4 +1,4 @@
-<img src="ChatGPTGammaPyToolkitBanner.png" alt="Project Logo" width="1200">
+<img src="Banner.png" alt="Project Logo" width="1200">
 
 # Introduction
 This Toolkit is used to run gammapy using VERITAS data.
@@ -25,5 +25,5 @@ This Toolkit is used to run gammapy using VERITAS data.
     -  Activate the environment where you have the [required packages](EnvironmentPackages.txt) (source ~/gpy_toolkit/bin/activate)
     -  Change directory to wherever RunGammapyGUI.py is (cd /your/path/to/GammapyToolkit/)
     -  Run the script (python RunGammaPyGUI.py)
-- If you wish, you can also give your bash script a logo such as the one provided [here](ChatGPTGammaPyScriptLogo.png).
+- If you wish, you can also give your bash script a logo such as the one provided [here](Logo.png).
     - On a mac, right click on the file, click `Get Info`, then click on the icon on the top left corner and paste your image there. 
